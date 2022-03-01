@@ -2,138 +2,44 @@
 # 2022-01-24
 # Building up from DanielJ example code
 
-
-# %%
-
-# standard lib imports
-
-# from msilib.schema import RadioButton
+# %% standard lib imports
 from shutil import ReadError
 import sys, copy, time
 from pathlib import Path
 import os
-
-from vedo import Plotter, printc,Mesh,base,pointcloud
-from PyQt5 import Qt, QtCore
+# %%
 
 # %% project-specific imports
-## Qt
+## Qt + vtk widget
 from PyQt5.uic import loadUi
-
 from PyQt5.QtWidgets import (
     QMainWindow, 
-    QFileDialog, 
-    QListWidgetItem, 
-    QMessageBox, 
+    QFileDialog,
     QApplication,
     QApplication
 )
-from numpy import polymul
-
-## These for embeded pythion console
-
-#import os
-os.environ['QT_API'] = 'pyqt5'
-
-from PyQt5.QtCore import QSize
-# ipython won't work if this is not correctly installed. And the error message will be misleading
-from PyQt5 import QtSvg 
-#
-
-from IPython.qt.console.rich_ipython_widget import RichIPythonWidget
-#from IPython.qt.inprocess import QtInProcessKernelManager
-# these are updated based on error messages
-#from qtconsole import rich_ipython_widget
-
-from qtconsole.inprocess import QtInProcessKernelManager
-
-## vtk
-# from vtkmodules.vtkIOPLY import (
-#     vtkPLYReader
-# )
-# from vtkmodules.vtkRenderingCore import (
-#     vtkActor,
-#     vtkPolyDataMapper,
-#     # vtkRenderWindow,
-#     # vtkRenderWindowInteractor,
-#     vtkRenderer
-# )
-# from vtkmodules.vtkCommonColor import vtkNamedColors
-# from vtkmodules.vtkInteractionStyle import vtkInteractorStyleTrackballCamera
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+# from PyQt5 import Qt, QtCore
 
-# from vtkmodules.vtkIOGeometry import (
-#     vtkBYUReader,
-#     vtkOBJReader,
-#     vtkSTLReader
-# )
+## vedo
+from vedo import Plotter, printc,Mesh,base,pointcloud
 
-# from vtkmodules.vtkIOLegacy import vtkPolyDataReader
-# from vtkmodules.vtkIOPLY import vtkPLYReader
-# from vtkmodules.vtkIOXML import vtkXMLPolyDataReader
+## iPython
+# These for embeded pythion console
+os.environ['QT_API'] = 'pyqt5'
+# iPython won't work if this is not correctly installed. And the error message will be misleading
+from IPython.qt.console.rich_ipython_widget import RichIPythonWidget
+# from IPython.qt.inprocess import QtInProcessKernelManager
 
-
-
-# project imports
-
-# from job import *
-
+## qtconsole
+# these are updated based on error messages
+from qtconsole.inprocess import QtInProcessKernelManager
+# from qtconsole import rich_ipython_widget
 # %%
 
-
-
-
-# %%
-
-
-
-# def ReadPolyData(file_name):
-#     valid_suffixes = ['.g', '.obj', '.stl', '.ply', '.vtk', '.vtp']
-#     path = Path(file_name)
-#     if path.suffix:
-#         ext = path.suffix.lower()
-#     if path.suffix not in valid_suffixes:
-#         print(f'No reader for this file suffix: {ext}')
-#         return None
-#     else:
-#         if ext == ".ply":
-#             reader = vtkPLYReader()
-#             reader.SetFileName(file_name)
-#             reader.Update()
-#             poly_data = reader.GetOutput()
-#         elif ext == ".vtp":
-#             reader = vtkXMLPolyDataReader()
-#             reader.SetFileName(file_name)
-#             reader.Update()
-#             poly_data = reader.GetOutput()
-#         elif ext == ".obj":
-#             reader = vtkOBJReader()
-#             reader.SetFileName(file_name)
-#             reader.Update()
-#             poly_data = reader.GetOutput()
-#         elif ext == ".stl":
-#             reader = vtkSTLReader()
-#             reader.SetFileName(file_name)
-#             reader.Update()
-#             poly_data = reader.GetOutput()
-#         elif ext == ".vtk":
-#             reader = vtkPolyDataReader()
-#             reader.SetFileName(file_name)
-#             reader.Update()
-#             poly_data = reader.GetOutput()
-#         elif ext == ".g":
-#             reader = vtkBYUReader()
-#             reader.SetGeometryFileName(file_name)
-#             reader.Update()
-#             poly_data = reader.GetOutput()
-
-#         return poly_data
-
-
-# %%
-
+#-------------------------------------------------------------------------------------------------
+# %% Functions
 # this function to find "app" in the global namespace -- lame but for now...
-
 def get_app_qt5(*args, **kwargs):
     """Create a new qt5 app or return an existing one."""
     app = QApplication.instance()
@@ -146,10 +52,8 @@ def get_app_qt5(*args, **kwargs):
 # toy function to push to ipy
 def print_process_id():
     print('Process ID is:', os.getpid())
-# %%
+    
 # this class for the console
-
-
 class QIPythonWidget(RichIPythonWidget):
     """ Convenience class for a live IPython console widget. We can replace the standard banner using the customBanner argument
     """
@@ -185,9 +89,6 @@ class QIPythonWidget(RichIPythonWidget):
         """ Execute a command in the frame of the console widget """
         self._execute(command,False)
 
-
-# %%
-
 # Main application window
 class MainWindow(QMainWindow):
     inputPath = "" # absolute path to the input ply scan
@@ -198,33 +99,18 @@ class MainWindow(QMainWindow):
 
     def __init__(self,size):
         super(MainWindow, self).__init__()
-        # loadUi("SAS_GUI.ui", self) # load the components defined in th xml file
+
+        # load the components defined in th xml file
         loadUi("viewer_gui.ui", self)
         self.screenSize = size
+
         # Connections for all elements in Mainwindow
         self.pushButton_inputfile.clicked.connect(self.getFilePath)
         self.pushButton_clearSelection.clicked.connect(self.clearScreen)
-        # self.textBrowser_inputDir.textChanged.connect(self.textBrowserDir_state_changed)
-        # self.pushButton_outputDir.clicked.connect(self.getOutputFilePath)
-        # self.textBrowser_outputDir.textChanged.connect(self.textBrowserDir_state_changed)
-        # self.pushButton_monitor.clicked.connect(self.expandMonitor)
-        # self.pushButton_start.clicked.connect(self.startProcessing)
-        # self.pushButton_saveAndContinue.clicked.connect(self.saveAndContinue)
-        # self.pushButton_dontSave.clicked.connect(self.deleteAndContinue)
-        # self.pushButton_redo.clicked.connect(self.redo)
 
         # Set up VTK widget
         self.vtkWidget = QVTKRenderWindowInteractor()
         self.verticalLayout_midMid.addWidget(self.vtkWidget)
-        # self.ren = vtkRenderer()
-        # colors = vtkNamedColors()
-        # self.ren.SetBackground(colors.GetColor3d('White')) # DarkSlateBlue
-        # self.ren.SetBackground2(colors.GetColor3d('MidnightBlue'))
-        # self.ren.GradientBackgroundOn()
-        # self.vtkWidget.GetRenderWindow().AddRenderer(self.ren)
-        # self.iren = self.vtkWidget.GetRenderWindow().GetInteractor()
-        # style = vtkInteractorStyleTrackballCamera()
-        # self.iren.SetInteractorStyle(style)
 
         # ipy console
         self.ipyConsole = QIPythonWidget(customBanner="Welcome to the embedded ipython console\n")
@@ -239,10 +125,6 @@ class MainWindow(QMainWindow):
         self.id1 = self.plt.addCallback("mouse click", self.onMouseClick)
         self.id2 = self.plt.addCallback("key press",   self.onKeypress)
         self.plt.show(__doc__)                  # <--- show the vedo rendering
-
-        
-
-        
 
     def onMouseClick(self, event):
         if(self.radioButton_selectActor.isChecked()):
@@ -283,51 +165,29 @@ class MainWindow(QMainWindow):
         printc("..calling onClose")
         self.vtkWidget.close()
 
+    #  getDirPath opens a file dialog and only allows the user to select folders
     def getDirPath(self):
-        """
-        getDirPath opens a file dialog and only allows the user to select folders
-        """ 
         return QFileDialog.getExistingDirectory(self, "Open Directory",
                                                 os.getcwd(),
                                                 QFileDialog.ShowDirsOnly
                                                 | QFileDialog.DontResolveSymlinks)
-    ## MPR
+
+    ## open a file dialog and select a file
     def getFilePath(self, button_state, load_file=True, display_result=True):
-        """
-        open a file dialog and select a file
-        """ 
         self.inputPath = QFileDialog.getOpenFileName(self, 'Open File', 
          os.getcwd(), "Ply Files (*.ply);;OBJ Files (*.obj);;STL Files (*.stl)")[0]
         
         print("got input path: ", self.inputPath)
-
-        # display the file?
-        
         if load_file:
-            # print("trying to load file")
-            # self.loadFile(self.inputPath)
-            self.displayResult()
-            print("loaded file: ", self.inputPath)
-            # if display_result:
-            #     print("displaying results...")
-            #     self.displayResult(self.polyData)
+            if display_result:
+                print("displaying results...")
+                self.displayResult()
         else: 
             print("load_file must not be true!", load_file)
-            
-            
-        # self.displayResult(self.inputPath)
         return self.inputPath
 
-    # def loadFile(self, filename):
-    #     """ load the specified file """
-    #     print("in load file")
-    #     self.polyData = ReadPolyData(filename)
-    #     return self.polyData 
-
+    # enable the start button if both the input and output paths are selected.
     def textBrowserDir_state_changed(self):
-        """
-        enable the start button if both the input and output paths are selected.
-        """ 
         if (self.inputPath and self.outputPath):
             self.pushButton_start.setEnabled(True)
         else:
@@ -340,33 +200,13 @@ class MainWindow(QMainWindow):
         print("Cleared screen!")
 
     def displayResult(self):
-    #     self.ren.RemoveAllViewProps()
-    #     # Read and display for verification
-    #     #reader = vtkPLYReader()
-    #    # reader.SetFileName(filename)
-    #    # temp hardcode file name
-    #     # reader.SetFileName(self.inputPath)
-    #     #reader.Update()
-    #     # self.polyData = ReadPolyData(self.inputPath)
-    #     # Create a mapper
-    #     mapper = vtkPolyDataMapper()
-    #     # mapper.SetInputConnection(reader.GetOutputPort())
-    #     #mapper.SetInputConnection(reader.GetOutputPort())
-    #     mapper.SetInputData(polyData)
-    #     # Create an actor
-    #     actor = vtkActor()
-    #     actor.SetMapper(mapper)
-    #     self.ren.AddActor(actor)
-    #     self.ren.ResetCamera()
-    #     # Show
-    #     self.iren.Initialize()
-    #     self.iren.Start()
         m = Mesh(self.inputPath)
         self.plt.show(m,__doc__)                 # <--- show the vedo rendering
         printc("Number of points",base.BaseActor.N(m))
 
 # %% 
-
+#-------------------------------------------------------------------------------------------------
+# %% Main
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     screen = app.primaryScreen()
@@ -378,5 +218,4 @@ if __name__ == "__main__":
     
     sys.exit(app.exec())
     
-
 # %%
