@@ -1,6 +1,10 @@
 # Stripped down Qt-vtk-based viewer for ply, obj etc.
 # 2022-01-24
 # Building up from DanielJ example code
+# 2022-02-11
+# Implementing Picking
+# 2022-03-01
+# Fixing Picking + Implementing tree view for actors
 
 # %% standard lib imports
 from shutil import ReadError
@@ -55,8 +59,8 @@ def print_process_id():
     
 # this class for the console
 class QIPythonWidget(RichIPythonWidget):
-    """ Convenience class for a live IPython console widget. We can replace the standard banner using the customBanner argument
-    """
+    """ Convenience class for a live IPython console widget.
+    We can replace the standard banner using the customBanner argument """
     def __init__(self,customBanner=None,*args,**kwargs):
         super(QIPythonWidget, self).__init__(*args,**kwargs)
         if customBanner!=None: self.banner=customBanner
@@ -74,7 +78,8 @@ class QIPythonWidget(RichIPythonWidget):
         self.exit_requested.connect(stop)
 
     def pushVariables(self, variableDict):
-        """ Given a dictionary containing name / value pairs, push those variables to the IPython console widget """
+        """ Given a dictionary containing name / value pairs, 
+        push those variables to the IPython console widget """
         self.kernel_manager.kernel.shell.push(variableDict)
 
     def clearTerminal(self):
@@ -165,15 +170,15 @@ class MainWindow(QMainWindow):
         printc("..calling onClose")
         self.vtkWidget.close()
 
-    #  getDirPath opens a file dialog and only allows the user to select folders
     def getDirPath(self):
+        """ getDirPath opens a file dialog and only allows the user to select folders """
         return QFileDialog.getExistingDirectory(self, "Open Directory",
                                                 os.getcwd(),
                                                 QFileDialog.ShowDirsOnly
                                                 | QFileDialog.DontResolveSymlinks)
 
-    ## open a file dialog and select a file
     def getFilePath(self, button_state, load_file=True, display_result=True):
+        """ open a file dialog and select a file """
         self.inputPath = QFileDialog.getOpenFileName(self, 'Open File', 
          os.getcwd(), "Ply Files (*.ply);;OBJ Files (*.obj);;STL Files (*.stl)")[0]
         
@@ -186,8 +191,8 @@ class MainWindow(QMainWindow):
             print("load_file must not be true!", load_file)
         return self.inputPath
 
-    # enable the start button if both the input and output paths are selected.
     def textBrowserDir_state_changed(self):
+        """ enable the start button if both the input and output paths are selected. """
         if (self.inputPath and self.outputPath):
             self.pushButton_start.setEnabled(True)
         else:
