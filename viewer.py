@@ -20,10 +20,11 @@ from PyQt5.QtWidgets import (
     QMainWindow, 
     QFileDialog,
     QApplication,
-    QApplication
+    QApplication,
+    QSplitter
 )
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
-# from PyQt5 import Qt, QtCore
+from PyQt5 import Qt, QtCore
 
 ## vedo
 from vedo import Plotter, printc,Mesh,base,pointcloud
@@ -115,14 +116,16 @@ class MainWindow(QMainWindow):
 
         # Set up VTK widget
         self.vtkWidget = QVTKRenderWindowInteractor()
-        self.verticalLayout_midMid.addWidget(self.vtkWidget)
+        self.splitter_viewer.addWidget(self.vtkWidget)
 
         # ipy console
         self.ipyConsole = QIPythonWidget(customBanner="Welcome to the embedded ipython console\n")
-        self.horizontalLayout_midBottom.addWidget(self.ipyConsole)
+        self.splitter_viewer.addWidget(self.ipyConsole)
         self.ipyConsole.pushVariables({"foo":43, "print_process_id":print_process_id, "ipy":self.ipyConsole, "self":self})
-        self.ipyConsole.printText("The variable 'foo' and the method 'print_process_id()' are available. Use the 'whos' command for information.\n\nTo push variables run this before starting the UI:\n ipyConsole.pushVariables({\"foo\":43,\"print_process_id\":print_process_id})")
-       
+        self.ipyConsole.printText("The variable 'foo' and the method 'print_process_id()' are available.\
+            Use the 'whos' command for information.\n\nTo push variables run this before starting the UI:\
+                \n ipyConsole.pushVariables({\"foo\":43,\"print_process_id\":print_process_id})")
+
         # Create renderer and add the vedo objects and callbacks
         # s = QtCore.QSize(size[0],size[1])
         # print("x:",self.vtkWidget.x(),"; y: ",self.vtkWidget.y())
