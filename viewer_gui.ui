@@ -228,14 +228,14 @@ background-color: rgb(66, 133, 255);
       </property>
       <widget class="QWidget" name="panel_left" native="true">
        <layout class="QVBoxLayout" name="layout_left">
+        <property name="leftMargin">
+         <number>15</number>
+        </property>
+        <property name="rightMargin">
+         <number>15</number>
+        </property>
         <item>
          <widget class="QPushButton" name="pushButton_inputfile">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -302,12 +302,6 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="Line" name="line_topLeft">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="frameShadow">
            <enum>QFrame::Plain</enum>
           </property>
@@ -318,12 +312,6 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_outputDir">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="styleSheet">
            <string notr="true">QPushButton::hover{
 	background-color: rgb(20, 51, 89);
@@ -349,12 +337,6 @@ QPushButton:disabled {
         </item>
         <item>
          <widget class="QTextBrowser" name="textBrowser_outputDir">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="maximumSize">
            <size>
             <width>16777215</width>
@@ -378,12 +360,6 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="Line" name="line_bottomLeft">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
           <property name="styleSheet">
            <string notr="true">background-color: rgb(68, 67, 68);</string>
           </property>
@@ -455,11 +431,17 @@ QPushButton{
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="panel_mid_2" native="true">
+      <widget class="QWidget" name="panel_mid" native="true">
        <property name="styleSheet">
         <string notr="true">background-color: rgb(21, 21, 21);</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="leftMargin">
+         <number>15</number>
+        </property>
+        <property name="rightMargin">
+         <number>15</number>
+        </property>
         <item>
          <widget class="QLabel" name="label_viewer">
           <property name="font">
@@ -550,6 +532,12 @@ background-color: rgb(66, 133, 255);
         </size>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="leftMargin">
+         <number>15</number>
+        </property>
+        <property name="rightMargin">
+         <number>15</number>
+        </property>
         <item>
          <widget class="QLabel" name="label_activityMonitor">
           <property name="sizePolicy">
@@ -640,18 +628,68 @@ background-color: rgb(66, 133, 255);
     <string notr="true">background-color: rgb(51, 109, 186);</string>
    </property>
   </widget>
-  <action name="actionSave">
-   <property name="text">
-    <string>Save</string>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
    </property>
-  </action>
-  <action name="actionActivity_Monitor">
+   <property name="styleSheet">
+    <string notr="true">QToolBar { border: 0px }
+QToolButton {
+    border: 0px;
+}
+QToolButton:checked {
+	background-color: rgb(255, 255, 255);
+}</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action_selectActor"/>
+   <addaction name="action_selectVertex"/>
+  </widget>
+  <action name="action_selectVertex">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset>
-     <normaloff>:/newPrefix/info.png</normaloff>:/newPrefix/info.png</iconset>
+     <normaloff>res/pickPoint.png</normaloff>res/pickPoint.png</iconset>
    </property>
    <property name="text">
-    <string>Activity Monitor</string>
+    <string>selectVertex</string>
+   </property>
+  </action>
+  <action name="action_selectActor">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>res/pickActor.png</normaloff>res/pickActor.png</iconset>
+   </property>
+   <property name="text">
+    <string>selectActor</string>
+   </property>
+   <property name="toolTip">
+    <string>selectActor</string>
    </property>
   </action>
  </widget>

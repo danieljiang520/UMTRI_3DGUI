@@ -21,7 +21,6 @@ from PyQt5.QtWidgets import (
     QFileDialog,
     QApplication,
     QApplication,
-    QSplitter
 )
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from PyQt5 import Qt, QtCore
@@ -113,6 +112,8 @@ class MainWindow(QMainWindow):
         # Connections for all elements in Mainwindow
         self.pushButton_inputfile.clicked.connect(self.getFilePath)
         self.pushButton_clearSelection.clicked.connect(self.clearScreen)
+        self.action_selectVertex.toggled.connect(self.actionSelection_state_changed)
+        self.action_selectActor.toggled.connect(self.actionSelection_state_changed)
 
         # Set up VTK widget
         self.vtkWidget = QVTKRenderWindowInteractor()
@@ -129,15 +130,15 @@ class MainWindow(QMainWindow):
         # Create renderer and add the vedo objects and callbacks
         # s = QtCore.QSize(size[0],size[1])
         # print("x:",self.vtkWidget.x(),"; y: ",self.vtkWidget.y())
-        self.plt = Plotter(qtWidget=self.vtkWidget,bg='DarkSlateBlue',bg2='MidnightBlue')
+        self.plt = Plotter(qtWidget=self.vtkWidget,bg='DarkSlateBlue',bg2='MidnightBlue',screensize=(2048,1280))
         self.id1 = self.plt.addCallback("mouse click", self.onMouseClick)
         self.id2 = self.plt.addCallback("key press",   self.onKeypress)
         self.plt.show(__doc__)                  # <--- show the vedo rendering
 
     def onMouseClick(self, event):
-        if(self.radioButton_selectActor.isChecked()):
+        if(self.action_selectActor.isChecked()):
             self.selectActor(event)
-        elif(self.radioButton_selectVertex.isChecked()):
+        elif(self.action_selectVertex.isChecked()):
             self.selectVertex(event)
 
     def selectActor(self,event):
@@ -157,8 +158,8 @@ class MainWindow(QMainWindow):
             return
         # print(arr[event.actor.closestPoint(event.picked3d, returnPointId=True)])
         printc("You have clicked your mouse button. Event info:\n", event, c='y')
-        printc("Left button pressed on", [event.picked3d])
-        printc(event.picked3d[0]," ",len(event.picked3d))
+        printc("Left button pressed on 3d: ", [event.picked3d])
+        printc("Left button pressed on 2d: ", [event.picked2d])
         p = pointcloud.Point(pos=(event.picked3d[0],event.picked3d[1],event.picked3d[2]),r=12,c='red',alpha=0.5)
         # self.plt.remove(self.vertexSelections.pop()).add(p)
         self.vertexSelections.append(p)        
@@ -200,6 +201,12 @@ class MainWindow(QMainWindow):
             self.pushButton_start.setEnabled(True)
         else:
             self.pushButton_start.setEnabled(False)
+    
+    def actionSelection_state_changed(self):
+        if(self.action_selectActor.isChecked()):
+            self.action_selectVertex.setChecked(False)
+        elif(self.action_selectVertex.isChecked()):
+            self.action_selectActor.setChecked(False)
     
     def clearScreen(self):
         self.plt.clear(actors=self.vertexSelections)
