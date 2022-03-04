@@ -21,6 +21,7 @@ from PyQt5.QtWidgets import (
     QFileDialog,
     QApplication,
     QApplication,
+    QFileSystemModel
 )
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from PyQt5 import Qt, QtCore
@@ -110,10 +111,32 @@ class MainWindow(QMainWindow):
         self.screenSize = size
 
         # Connections for all elements in Mainwindow
-        self.pushButton_inputfile.clicked.connect(self.getFilePath)
-        self.pushButton_clearSelection.clicked.connect(self.clearScreen)
-        self.action_selectVertex.toggled.connect(self.actionSelection_state_changed)
-        self.action_selectActor.toggled.connect(self.actionSelection_state_changed)
+        self.actionImportMesh.triggered.connect(self.getFilePath)
+        self.actionclearSelection.triggered.connect(self.clearScreen)
+        self.action_selectVertex.toggled.connect(self.actionSelectVertex_state_changed)
+        self.action_selectActor.toggled.connect(self.actionSelectActor_state_changed)
+
+        # Set up file explorer
+        parser = QtCore.QCommandLineParser()
+        parser.setApplicationDescription("Qt Dir View Example")
+        parser.addHelpOption()
+        parser.addVersionOption()
+        dontUseCustomDirectoryIconsOption = QtCore.QCommandLineOption("c", "Set QFileSystemModel::DontUseCustomDirectoryIcons")
+        parser.addOption(dontUseCustomDirectoryIconsOption)
+        dontWatchOption = QtCore.QCommandLineOption("w", "Set QFileSystemModel::DontWatch")
+        parser.addOption(dontWatchOption)
+        parser.process(app)
+        model = QFileSystemModel()
+        model.setRootPath("")
+        if (parser.isSet(dontUseCustomDirectoryIconsOption)):
+            model.setOption(QFileSystemModel.DontUseCustomDirectoryIcons)
+        if (parser.isSet(dontWatchOption)):
+            model.setOption(QFileSystemModel.DontWatchForChanges)
+        self.tree.setModel(model)
+        availableSize = QtCore.QSize(self.tree.screen().availableGeometry().size())
+        self.tree.resize(availableSize / 2)
+        self.tree.setColumnWidth(0, int(self.tree.width() / 3))
+
 
         # Set up VTK widget
         self.vtkWidget = QVTKRenderWindowInteractor()
@@ -128,12 +151,10 @@ class MainWindow(QMainWindow):
                 \n ipyConsole.pushVariables({\"foo\":43,\"print_process_id\":print_process_id})")
 
         # Create renderer and add the vedo objects and callbacks
-        # s = QtCore.QSize(size[0],size[1])
-        # print("x:",self.vtkWidget.x(),"; y: ",self.vtkWidget.y())
-        self.plt = Plotter(qtWidget=self.vtkWidget,bg='DarkSlateBlue',bg2='MidnightBlue',screensize=(2048,1280))
+        self.plt = Plotter(qtWidget=self.vtkWidget,bg='DarkSlateBlue',bg2='MidnightBlue',screensize=(1792,1120))
         self.id1 = self.plt.addCallback("mouse click", self.onMouseClick)
         self.id2 = self.plt.addCallback("key press",   self.onKeypress)
-        self.plt.show(__doc__)                  # <--- show the vedo rendering
+        self.plt.show()                  # <--- show the vedo rendering
 
     def onMouseClick(self, event):
         if(self.action_selectActor.isChecked()):
@@ -161,8 +182,8 @@ class MainWindow(QMainWindow):
         printc("Left button pressed on 3d: ", [event.picked3d])
         printc("Left button pressed on 2d: ", [event.picked2d])
         p = pointcloud.Point(pos=(event.picked3d[0],event.picked3d[1],event.picked3d[2]),r=12,c='red',alpha=0.5)
-        # self.plt.remove(self.vertexSelections.pop()).add(p)
-        self.vertexSelections.append(p)        
+        self.vertexSelections.append(p)
+        # self.plt.remove(self.vertexSelections.pop()).add(p)        
         self.plt += p
 
     def onKeypress(self, evt):
@@ -202,10 +223,12 @@ class MainWindow(QMainWindow):
         else:
             self.pushButton_start.setEnabled(False)
     
-    def actionSelection_state_changed(self):
+    def actionSelectActor_state_changed(self):
         if(self.action_selectActor.isChecked()):
             self.action_selectVertex.setChecked(False)
-        elif(self.action_selectVertex.isChecked()):
+
+    def actionSelectVertex_state_changed(self):
+        if(self.action_selectVertex.isChecked()):
             self.action_selectActor.setChecked(False)
     
     def clearScreen(self):

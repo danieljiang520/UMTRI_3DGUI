@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>810</width>
-    <height>506</height>
+    <width>977</width>
+    <height>668</height>
    </rect>
   </property>
   <property name="font">
@@ -235,68 +235,17 @@ background-color: rgb(66, 133, 255);
          <number>15</number>
         </property>
         <item>
-         <widget class="QPushButton" name="pushButton_inputfile">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton::hover{
-	background-color: rgb(20, 51, 89);
-}
-QPushButton{
-	background-color: rgb(49, 110, 186);
-}
-QPushButton:disabled {
-	background-color: rgb(121, 121, 121);
-}</string>
+         <widget class="QLabel" name="label">
+          <property name="font">
+           <font>
+            <family>Arial</family>
+            <pointsize>18</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
           </property>
           <property name="text">
-           <string>Select File</string>
-          </property>
-          <property name="autoDefault">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_inputSign">
-          <property name="text">
-           <string>Input File:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QTextBrowser" name="textBrowser_inputDir">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>50</height>
-           </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="html">
-           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="openLinks">
-           <bool>true</bool>
+           <string>Explorer</string>
           </property>
          </widget>
         </item>
@@ -311,105 +260,12 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_outputDir">
-          <property name="styleSheet">
-           <string notr="true">QPushButton::hover{
-	background-color: rgb(20, 51, 89);
-}
-QPushButton{
-	background-color: rgb(49, 110, 186);
-}
-QPushButton:disabled {
-	background-color: rgb(121, 121, 121);
-}</string>
+         <widget class="QTreeView" name="tree">
+          <property name="indentation">
+           <number>10</number>
           </property>
-          <property name="text">
-           <string>Select Output Directory</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_outputSign">
-          <property name="text">
-           <string>Output Directory:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QTextBrowser" name="textBrowser_outputDir">
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>50</height>
-           </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="html">
-           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="Line" name="line_bottomLeft">
-          <property name="styleSheet">
-           <string notr="true">background-color: rgb(68, 67, 68);</string>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="lineWidth">
-           <number>1</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_selectionMode">
-          <property name="text">
-           <string>Selection Mode:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButton_selectActor">
-          <property name="text">
-           <string>Select Actor</string>
-          </property>
-          <property name="checked">
+          <property name="sortingEnabled">
            <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButton_selectVertex">
-          <property name="text">
-           <string>Select Vertex</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_clearSelection">
-          <property name="styleSheet">
-           <string notr="true">QPushButton::hover{
-	background-color: rgb(20, 51, 89);
-}
-QPushButton{
-	background-color: rgb(49, 110, 186);
-}</string>
-          </property>
-          <property name="text">
-           <string>Clear Selection</string>
           </property>
          </widget>
         </item>
@@ -432,6 +288,12 @@ QPushButton{
        </layout>
       </widget>
       <widget class="QWidget" name="panel_mid" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>500</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="styleSheet">
         <string notr="true">background-color: rgb(21, 21, 21);</string>
        </property>
@@ -470,38 +332,18 @@ QPushButton{
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_currentProject">
-          <property name="text">
-           <string>Current Project:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QTextBrowser" name="textBrowser_currentProject">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>50</height>
-           </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::Box</enum>
+         <widget class="Line" name="line_bottomLeft">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(68, 67, 68);</string>
           </property>
           <property name="frameShadow">
            <enum>QFrame::Plain</enum>
           </property>
-          <property name="html">
-           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <property name="lineWidth">
+           <number>1</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
@@ -525,9 +367,15 @@ background-color: rgb(66, 133, 255);
        </layout>
       </widget>
       <widget class="QWidget" name="panel_right" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="maximumSize">
         <size>
-         <width>220</width>
+         <width>250</width>
          <height>16777215</height>
         </size>
        </property>
@@ -620,8 +468,6 @@ background-color: rgb(66, 133, 255);
      </widget>
     </item>
    </layout>
-   <zorder>splitter_main</zorder>
-   <zorder>verticalWidget_menu</zorder>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="styleSheet">
@@ -629,20 +475,38 @@ background-color: rgb(66, 133, 255);
    </property>
   </widget>
   <widget class="QToolBar" name="toolBar">
+   <property name="cursor">
+    <cursorShape>PointingHandCursor</cursorShape>
+   </property>
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
    <property name="styleSheet">
-    <string notr="true">QToolBar { border: 0px }
+    <string notr="true">QToolBar { 
+	border: 0px ;
+}
 QToolButton {
-    border: 0px;
+     border: 0px;
+	padding:5px;
+}
+QToolButton:hover {
+	background-color: rgb(255, 255, 255);
 }
 QToolButton:checked {
-	background-color: rgb(255, 255, 255);
+	 border: 5px;
 }</string>
    </property>
    <property name="movable">
     <bool>false</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::NoToolBarArea</set>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>20</width>
+     <height>20</height>
+    </size>
    </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
@@ -652,6 +516,48 @@ QToolButton:checked {
    </attribute>
    <addaction name="action_selectActor"/>
    <addaction name="action_selectVertex"/>
+   <addaction name="actionclearSelection"/>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>977</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="defaultUp">
+    <bool>true</bool>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionImportMesh"/>
+    <addaction name="actionExportMesh"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <widget class="QMenu" name="menuSelection">
+     <property name="title">
+      <string>Selection</string>
+     </property>
+     <addaction name="actionclearSelection"/>
+    </widget>
+    <addaction name="menuSelection"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionExplorer"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuView"/>
   </widget>
   <action name="action_selectVertex">
    <property name="checkable">
@@ -665,7 +571,8 @@ QToolButton:checked {
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>res/pickPoint.png</normaloff>res/pickPoint.png</iconset>
+     <normaloff>res/pickPoint_off.png</normaloff>
+     <normalon>res/pickPoint_on.png</normalon>res/pickPoint_off.png</iconset>
    </property>
    <property name="text">
     <string>selectVertex</string>
@@ -683,13 +590,52 @@ QToolButton:checked {
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>res/pickActor.png</normaloff>res/pickActor.png</iconset>
+     <normaloff>res/pickActor_off.png</normaloff>
+     <normalon>res/pickActor_on.png</normalon>res/pickActor_off.png</iconset>
    </property>
    <property name="text">
     <string>selectActor</string>
    </property>
    <property name="toolTip">
     <string>selectActor</string>
+   </property>
+  </action>
+  <action name="actionImportMesh">
+   <property name="text">
+    <string>Import Mesh...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="actionExportMesh">
+   <property name="text">
+    <string>Export Mesh...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="actionclearSelection">
+   <property name="icon">
+    <iconset>
+     <normaloff>res/clearSelection.png</normaloff>res/clearSelection.png</iconset>
+   </property>
+   <property name="text">
+    <string>Clear Selection</string>
+   </property>
+  </action>
+  <action name="actionClear_Selection">
+   <property name="text">
+    <string>Clear Selection</string>
+   </property>
+  </action>
+  <action name="actionExplorer">
+   <property name="text">
+    <string>Explorer</string>
    </property>
   </action>
  </widget>
