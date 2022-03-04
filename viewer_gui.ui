@@ -261,6 +261,9 @@ background-color: rgb(66, 133, 255);
         </item>
         <item>
          <widget class="QTreeView" name="tree">
+          <property name="dragEnabled">
+           <bool>true</bool>
+          </property>
           <property name="indentation">
            <number>10</number>
           </property>
@@ -373,12 +376,6 @@ background-color: rgb(66, 133, 255);
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="maximumSize">
-        <size>
-         <width>250</width>
-         <height>16777215</height>
-        </size>
-       </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="leftMargin">
          <number>15</number>
@@ -403,7 +400,7 @@ background-color: rgb(66, 133, 255);
            </font>
           </property>
           <property name="text">
-           <string>Activity Monitor</string>
+           <string>Objects</string>
           </property>
           <property name="indent">
            <number>0</number>
@@ -411,41 +408,11 @@ background-color: rgb(66, 133, 255);
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_savedProjects">
-          <property name="text">
-           <string>Saved Projects:</string>
+         <widget class="QTreeView" name="treeView_projects">
+          <property name="dragEnabled">
+           <bool>true</bool>
           </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QListWidget" name="listWidget_savedProjects">
-          <property name="frameShape">
-           <enum>QFrame::Box</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="lineWidth">
-           <number>1</number>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_unsavedProjects">
-          <property name="text">
-           <string>Unsaved projects:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QListWidget" name="listWidget_unsavedProjects">
-          <property name="frameShape">
-           <enum>QFrame::Box</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="tabKeyNavigation">
+          <property name="headerHidden">
            <bool>true</bool>
           </property>
          </widget>

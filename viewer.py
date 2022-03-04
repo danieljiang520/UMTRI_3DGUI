@@ -24,7 +24,8 @@ from PyQt5.QtWidgets import (
     QFileSystemModel
 )
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
-from PyQt5 import Qt, QtCore
+from PyQt5 import QtCore
+from PyQt5.Qt import QStandardItemModel, QStandardItem
 
 ## vedo
 from vedo import Plotter, printc,Mesh,base,pointcloud
@@ -126,17 +127,23 @@ class MainWindow(QMainWindow):
         dontWatchOption = QtCore.QCommandLineOption("w", "Set QFileSystemModel::DontWatch")
         parser.addOption(dontWatchOption)
         parser.process(app)
-        model = QFileSystemModel()
-        model.setRootPath("")
+
+        # Set up tree view for file explorer
+        dirModel = QFileSystemModel()
+        dirModel.setRootPath(QtCore.QDir.currentPath())
         if (parser.isSet(dontUseCustomDirectoryIconsOption)):
-            model.setOption(QFileSystemModel.DontUseCustomDirectoryIcons)
+            dirModel.setOption(QFileSystemModel.DontUseCustomDirectoryIcons)
         if (parser.isSet(dontWatchOption)):
-            model.setOption(QFileSystemModel.DontWatchForChanges)
-        self.tree.setModel(model)
+            dirModel.setOption(QFileSystemModel.DontWatchForChanges)
+        self.tree.setModel(dirModel)
         availableSize = QtCore.QSize(self.tree.screen().availableGeometry().size())
         self.tree.resize(availableSize / 2)
         self.tree.setColumnWidth(0, int(self.tree.width() / 3))
 
+        # Set up tree view for projects
+        self.treeModel = QStandardItemModel()
+        self.rootNode = self.treeModel.invisibleRootItem()
+        self.treeView_projects.setModel(self.treeModel)
 
         # Set up VTK widget
         self.vtkWidget = QVTKRenderWindowInteractor()
@@ -215,13 +222,6 @@ class MainWindow(QMainWindow):
         else: 
             print("load_file must not be true!", load_file)
         return self.inputPath
-
-    def textBrowserDir_state_changed(self):
-        """ enable the start button if both the input and output paths are selected. """
-        if (self.inputPath and self.outputPath):
-            self.pushButton_start.setEnabled(True)
-        else:
-            self.pushButton_start.setEnabled(False)
     
     def actionSelectActor_state_changed(self):
         if(self.action_selectActor.isChecked()):
@@ -239,8 +239,14 @@ class MainWindow(QMainWindow):
 
     def displayResult(self):
         m = Mesh(self.inputPath)
-        self.plt.show(m,__doc__)                 # <--- show the vedo rendering
-        printc("Number of points",base.BaseActor.N(m))
+        self.plt += m
+        # self.plt.show()                 # <--- show the vedo rendering
+        objectTreeItem = QStandardItem(os.path.basename(self.inputPath))
+        fileDirTreeItem = QStandardItem("File: "+self.inputPath)
+        numVerticesTreeItem = QStandardItem("Vertices: "+str(base.BaseActor.N(m)))
+        numFacesTreeItem = QStandardItem("Faces: "+str(base.BaseActor.NCells(m)))
+        objectTreeItem.appendRows([fileDirTreeItem,numVerticesTreeItem,numFacesTreeItem])
+        self.rootNode.appendRow(objectTreeItem)
 
 # %% 
 #-------------------------------------------------------------------------------------------------
