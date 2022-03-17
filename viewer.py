@@ -34,7 +34,8 @@ from vedo import Plotter, printc,Mesh,base,pointcloud
 # These for embeded pythion console
 os.environ['QT_API'] = 'pyqt5'
 # iPython won't work if this is not correctly installed. And the error message will be misleading
-from IPython.qt.console.rich_ipython_widget import RichIPythonWidget
+# from IPython.qt.console.rich_ipython_widget import RichIPythonWidget # deprecated
+from qtconsole.rich_ipython_widget import RichIPythonWidget
 # from IPython.qt.inprocess import QtInProcessKernelManager
 
 ## qtconsole
@@ -101,8 +102,10 @@ class MainWindow(QMainWindow):
     inputPath = "" # absolute path to the input ply scan
     outputPath = "" # absolute path to the output folder
     resultPath = "" # path to the most recent finished project ply file
+    currentFolder = "" # path to current folder
     vertexSelections = [None]
     actorSelection = None
+    dirModel = QFileSystemModel()
 
     def __init__(self,size):
         super(MainWindow, self).__init__()
@@ -116,6 +119,7 @@ class MainWindow(QMainWindow):
         self.actionclearSelection.triggered.connect(self.clearScreen)
         self.action_selectVertex.toggled.connect(self.actionSelectVertex_state_changed)
         self.action_selectActor.toggled.connect(self.actionSelectActor_state_changed)
+        self.toolButton_explorer.clicked.connect(self.getDirPath)
 
         # Set up file explorer
         parser = QtCore.QCommandLineParser()
@@ -129,16 +133,20 @@ class MainWindow(QMainWindow):
         parser.process(app)
 
         # Set up tree view for file explorer
-        dirModel = QFileSystemModel()
-        dirModel.setRootPath(QtCore.QDir.currentPath())
-        if (parser.isSet(dontUseCustomDirectoryIconsOption)):
-            dirModel.setOption(QFileSystemModel.DontUseCustomDirectoryIcons)
-        if (parser.isSet(dontWatchOption)):
-            dirModel.setOption(QFileSystemModel.DontWatchForChanges)
-        self.tree.setModel(dirModel)
-        availableSize = QtCore.QSize(self.tree.screen().availableGeometry().size())
-        self.tree.resize(availableSize / 2)
-        self.tree.setColumnWidth(0, int(self.tree.width() / 3))
+        self.dirModel.setRootPath(QtCore.QDir.currentPath())
+        # if (parser.isSet(dontUseCustomDirectoryIconsOption)):
+        #     dirModel.setOption(QFileSystemModel.DontUseCustomDirectoryIcons)
+        # if (parser.isSet(dontWatchOption)):
+        #     dirModel.setOption(QFileSystemModel.DontWatchForChanges)
+
+        self.treeView_explorer.setModel(self.dirModel)
+        self.treeView_explorer.setRootIndex(self.dirModel.index(QtCore.QDir.currentPath()))
+        # availableSize = QtCore.QSize(self.tree.screen().availableGeometry().size())
+        # self.tree.resize(availableSize / 2)
+        # self.tree.setColumnWidth(0, int(self.tree.width() / 3))
+        self.treeView_explorer.hideColumn(1)
+        self.treeView_explorer.hideColumn(2)
+        self.treeView_explorer.hideColumn(3)
 
         # Set up tree view for projects
         self.treeModel = QStandardItemModel()
@@ -202,12 +210,15 @@ class MainWindow(QMainWindow):
         printc("..calling onClose")
         self.vtkWidget.close()
 
-    def getDirPath(self):
+    def getDirPath(self, setExplorer=True):
         """ getDirPath opens a file dialog and only allows the user to select folders """
-        return QFileDialog.getExistingDirectory(self, "Open Directory",
+        print("opening folder prompt")
+        self.currentFolder = QFileDialog.getExistingDirectory(self, "Open Directory",
                                                 os.getcwd(),
                                                 QFileDialog.ShowDirsOnly
                                                 | QFileDialog.DontResolveSymlinks)
+        if setExplorer:
+            self.treeView_explorer.setRootIndex(self.dirModel.index(self.currentFolder))
 
     def getFilePath(self, button_state, load_file=True, display_result=True):
         """ open a file dialog and select a file """
