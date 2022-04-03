@@ -34,8 +34,12 @@ from vedo import (
     printc,
     Mesh,
     base,
-    pointcloud,
-    Point
+    Point,
+    Points,
+    Line,
+    Ribbon,
+    fitPlane,
+    Text2D
 )
 from vedo.cli import exe_info
 from vedo.applications import FreeHandCutPlotter
@@ -115,6 +119,10 @@ class MainWindow(QMainWindow):
     vertexSelections = [None]
     actorSelection = None
     dirModel = QFileSystemModel()
+    selectMode = False
+    selectedCpoints = []
+    selectedPoints = None
+    spline = None
 
     def __init__(self,size):
         super(MainWindow, self).__init__()
@@ -128,7 +136,7 @@ class MainWindow(QMainWindow):
         self.actionclearSelection.triggered.connect(self.clearScreen)
         self.action_selectVertex.toggled.connect(self.actionSelectVertex_state_changed)
         self.action_selectActor.toggled.connect(self.actionSelectActor_state_changed)
-        self.actionCutter.toggled.connect(self.actionCutter_state_changed)
+        # self.actionCutter.toggled.connect(self.actionCutter_state_changed)
         self.toolButton_explorer.clicked.connect(self.getDirPath)
 
         """ Set up file explorer """
@@ -173,8 +181,9 @@ class MainWindow(QMainWindow):
 
         """ Create renderer and add the vedo objects and callbacks """
         self.plt = Plotter(qtWidget=self.vtkWidget,bg='DarkSlateBlue',bg2='MidnightBlue',screensize=(1792,1120))
-        self.id1 = self.plt.addCallback("RightButtonPress", self.onRightClick)
-        # self.id2 = self.plt.addCallback("key press",   self.onKeypress)
+        self.plt.addCallback("RightButtonPress", self.onRightClick)
+        self.plt.addCallback("key press", self.onKeyPress)
+        self.plt.addCallback('MouseMove', self.onMouseMove)
         self.plt.show(zoom=True)                  # <--- show the vedo rendering
 
     def onRightClick(self, event):
@@ -182,6 +191,29 @@ class MainWindow(QMainWindow):
             self.selectActor(event)
         elif(self.action_selectVertex.isChecked()):
             self.selectVertex(event)
+        elif(self.actionCutter.isChecked()):
+            self.selectMode = not self.selectMode # toggle mode
+
+    def onMouseMove(self, evt):
+        if self.selectMode:
+            self.plt.remove([self.selectedPoints, self.spline])
+            cpt = self.plt.computeWorldPosition(evt.picked2d) # make this 2d-screen point 3d
+            self.selectedCpoints.append(cpt)
+            self.selectedPoints = Points(self.selectedCpoints, r=8).c('black')
+            if len(self.selectedCpoints) > 2:
+                self.spline = Line(self.selectedCpoints, closed=True).lw(5).c('red5')
+                self.plt.add([self.selectedPoints, self.spline])
+
+    def onKeyPress(self, evt):
+        if evt.keyPressed == 'z' and self.spline:       # cut mesh with a ribbon-like surface
+            printc("Cutting the mesh please wait..", invert=True)
+            tol = self.m.diagonalSize()/2            # size of ribbon
+            pts = self.spline.points()
+            n = fitPlane(pts, signed=True).normal  # compute normal vector to points
+            rib = Ribbon(pts - tol*n, pts + tol*n, closed=True)
+            self.m.cutWithMesh(rib)
+            self.plt.remove([self.spline, self.selectedPoints]).render()
+            self.selectedCpoints, self.selectedPoints, self.spline = [], None, None
 
     def selectActor(self,event):
         if(not event.actor):
@@ -203,9 +235,6 @@ class MainWindow(QMainWindow):
         pt = Point(event.picked3d).c('pink').ps(12)
         self.vertexSelections.append(pt)
         self.plt.at(i).add(pt)
-
-    # def onKeypress(self, evt):
-        # printc("You have pressed key:", evt.keyPressed, c='b')
 
     def onClose(self):
         #Disable the interactor before closing to prevent it
@@ -244,12 +273,6 @@ class MainWindow(QMainWindow):
     def actionSelectVertex_state_changed(self):
         if(self.action_selectVertex.isChecked()):
             self.action_selectActor.setChecked(False)
-
-    def actionCutter_state_changed(self):
-        if(not self.actionCutter.isChecked()):
-            return
-        self.plt = FreeHandCutPlotter(self.m)
-        self.plt.start().close()
 
     def clearScreen(self):
         self.plt.clear(self.vertexSelections)

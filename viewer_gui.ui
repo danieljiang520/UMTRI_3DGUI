@@ -703,7 +703,8 @@ QToolButton:checked {
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>res/logo.png</normaloff>res/logo.png</iconset>
+     <normaloff>res/select_off.png</normaloff>
+     <normalon>res/select_on.png</normalon>res/select_off.png</iconset>
    </property>
    <property name="text">
     <string>Cutter</string>
