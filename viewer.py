@@ -38,6 +38,7 @@ from vedo import (
     Point
 )
 from vedo.cli import exe_info
+from vedo.applications import FreeHandCutPlotter
 
 ## iPython
 # These for embeded pythion console
@@ -122,14 +123,15 @@ class MainWindow(QMainWindow):
         loadUi("viewer_gui.ui", self)
         self.screenSize = size
 
-        # Connections for all elements in Mainwindow
+        """ Connections for all elements in Mainwindow """
         self.actionImportMesh.triggered.connect(self.getFilePath)
         self.actionclearSelection.triggered.connect(self.clearScreen)
         self.action_selectVertex.toggled.connect(self.actionSelectVertex_state_changed)
         self.action_selectActor.toggled.connect(self.actionSelectActor_state_changed)
+        self.actionCutter.toggled.connect(self.actionCutter_state_changed)
         self.toolButton_explorer.clicked.connect(self.getDirPath)
 
-        # Set up file explorer
+        """ Set up file explorer """
         parser = QtCore.QCommandLineParser()
         parser.setApplicationDescription("Qt Dir View Example")
         parser.addHelpOption()
@@ -140,13 +142,8 @@ class MainWindow(QMainWindow):
         parser.addOption(dontWatchOption)
         parser.process(app)
 
-        # Set up tree view for file explorer
+        """ Set up tree view for file explorer """
         self.dirModel.setRootPath(QtCore.QDir.currentPath())
-        # if (parser.isSet(dontUseCustomDirectoryIconsOption)):
-        #     dirModel.setOption(QFileSystemModel.DontUseCustomDirectoryIcons)
-        # if (parser.isSet(dontWatchOption)):
-        #     dirModel.setOption(QFileSystemModel.DontWatchForChanges)
-
         self.treeView_explorer.setModel(self.dirModel)
         self.treeView_explorer.setRootIndex(self.dirModel.index(QtCore.QDir.currentPath()))
         # availableSize = QtCore.QSize(self.tree.screen().availableGeometry().size())
@@ -156,30 +153,31 @@ class MainWindow(QMainWindow):
         self.treeView_explorer.hideColumn(2)
         self.treeView_explorer.hideColumn(3)
 
-        # Set up tree view for projects
+        """ Set up tree view for projects """
         self.treeModel = QStandardItemModel()
         self.rootNode = self.treeModel.invisibleRootItem()
         self.treeView_projects.setModel(self.treeModel)
 
-        # Set up VTK widget
+        """ Set up VTK widget """
         self.vtkWidget = QVTKRenderWindowInteractor()
         self.splitter_viewer.addWidget(self.vtkWidget)
 
-        # ipy console
+        """ ipy console """
         self.ipyConsole = QIPythonWidget(customBanner="Welcome to the embedded ipython console\n")
+        self.ipyConsole.console_height = 5
         self.splitter_viewer.addWidget(self.ipyConsole)
         self.ipyConsole.pushVariables({"foo":43, "print_process_id":print_process_id, "ipy":self.ipyConsole, "self":self})
         self.ipyConsole.printText("The variable 'foo' and the method 'print_process_id()' are available.\
             Use the 'whos' command for information.\n\nTo push variables run this before starting the UI:\
                 \n ipyConsole.pushVariables({\"foo\":43,\"print_process_id\":print_process_id})")
 
-        # Create renderer and add the vedo objects and callbacks
+        """ Create renderer and add the vedo objects and callbacks """
         self.plt = Plotter(qtWidget=self.vtkWidget,bg='DarkSlateBlue',bg2='MidnightBlue',screensize=(1792,1120))
-        self.id1 = self.plt.addCallback("mouse click", self.onMouseClick)
+        self.id1 = self.plt.addCallback("RightButtonPress", self.onRightClick)
         # self.id2 = self.plt.addCallback("key press",   self.onKeypress)
         self.plt.show(zoom=True)                  # <--- show the vedo rendering
 
-    def onMouseClick(self, event):
+    def onRightClick(self, event):
         if(self.action_selectActor.isChecked()):
             self.selectActor(event)
         elif(self.action_selectVertex.isChecked()):
@@ -188,13 +186,14 @@ class MainWindow(QMainWindow):
     def selectActor(self,event):
         if(not event.actor):
             return
+        i = event.at
         printc("Left button pressed on 3D", event.picked3d, c='g')
         # adding a silhouette might cause some lags
         # self.plt += event.actor.silhouette().lineWidth(2).c('red')
         #an alternative solution
         self.actorSelection = event.actor.clone()
         self.actorSelection.c('red')
-        self.plt += self.actorSelection
+        self.plt.at(i).add(self.actorSelection)
 
     def selectVertex(self,event):
         if(not event.isPoints):
@@ -203,7 +202,6 @@ class MainWindow(QMainWindow):
         printc("Left button pressed on 3D", event.picked3d, c='g')
         pt = Point(event.picked3d).c('pink').ps(12)
         self.vertexSelections.append(pt)
-        # self.plt.remove(self.vertexSelections.pop()).add(p)
         self.plt.at(i).add(pt)
 
     # def onKeypress(self, evt):
@@ -247,20 +245,25 @@ class MainWindow(QMainWindow):
         if(self.action_selectVertex.isChecked()):
             self.action_selectActor.setChecked(False)
 
+    def actionCutter_state_changed(self):
+        if(not self.actionCutter.isChecked()):
+            return
+        self.plt = FreeHandCutPlotter(self.m)
+        self.plt.start().close()
+
     def clearScreen(self):
-        self.plt.clear(actors=self.vertexSelections)
-        self.plt.clear(actors=self.actorSelection)
-        self.plt.show(__doc__)
+        self.plt.clear(self.vertexSelections)
+        self.plt.show()
         print("Cleared screen!")
 
     def displayResult(self):
-        m = Mesh(self.inputPath)
-        self.plt.add(m)
-        # self.plt.show()                 # <--- show the vedo rendering
+        self.m = Mesh(self.inputPath)
+        self.plt.add(self.m)
+        self.plt.show(zoom=True)                 # <--- show the vedo rendering
         objectTreeItem = QStandardItem(os.path.basename(self.inputPath))
         fileDirTreeItem = QStandardItem("File: "+self.inputPath)
-        numVerticesTreeItem = QStandardItem("Vertices: "+str(base.BaseActor.N(m)))
-        numFacesTreeItem = QStandardItem("Faces: "+str(base.BaseActor.NCells(m)))
+        numVerticesTreeItem = QStandardItem("Vertices: "+str(base.BaseActor.N(self.m)))
+        numFacesTreeItem = QStandardItem("Faces: "+str(base.BaseActor.NCells(self.m)))
         objectTreeItem.appendRows([fileDirTreeItem,numVerticesTreeItem,numFacesTreeItem])
         self.rootNode.appendRow(objectTreeItem)
 

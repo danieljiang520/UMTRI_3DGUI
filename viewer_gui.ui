@@ -315,6 +315,12 @@ background-color: rgb(66, 133, 255);
           <property name="sizeType">
            <enum>QSizePolicy::Expanding</enum>
           </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
          </spacer>
         </item>
        </layout>
@@ -552,6 +558,7 @@ QToolButton:checked {
    </attribute>
    <addaction name="action_selectActor"/>
    <addaction name="action_selectVertex"/>
+   <addaction name="actionCutter"/>
    <addaction name="actionclearSelection"/>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -688,6 +695,18 @@ QToolButton:checked {
    </property>
    <property name="shortcut">
     <string>Ctrl+,</string>
+   </property>
+  </action>
+  <action name="actionCutter">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset>
+     <normaloff>res/logo.png</normaloff>res/logo.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cutter</string>
    </property>
   </action>
  </widget>
