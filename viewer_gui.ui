@@ -205,6 +205,40 @@ QPushButton{
          </property>
         </spacer>
        </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_settings">
+         <property name="minimumSize">
+          <size>
+           <width>40</width>
+           <height>40</height>
+          </size>
+         </property>
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton:hover{
+	background-color: rgb(255, 255, 255);
+}
+QPushButton{
+	border : 0px
+}</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset>
+           <normaloff>res/settings.png</normaloff>res/settings.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>25</width>
+           <height>25</height>
+          </size>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </item>
@@ -270,6 +304,10 @@ background-color: rgb(66, 133, 255);
            <widget class="QToolButton" name="toolButton_explorer">
             <property name="text">
              <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset>
+              <normaloff>res/folder.png</normaloff>res/folder.png</iconset>
             </property>
             <property name="autoRaise">
              <bool>true</bool>
@@ -422,9 +460,25 @@ background-color: rgb(66, 133, 255);
            <enum>Qt::Vertical</enum>
           </property>
           <property name="handleWidth">
-           <number>3</number>
+           <number>5</number>
           </property>
           <widget class="QTabWidget" name="tabWidget">
+           <property name="styleSheet">
+            <string notr="true">QTabBar::tab 
+{
+    background-color: rgb(80, 80, 80);
+    color: rgb(133, 133, 133); 
+}
+
+QTabBar::tab:selected
+{
+    color: white;
+    background: rgb(30,30,30); 
+}
+QTabWidget::tab-bar {
+    left: 0; 
+}</string>
+           </property>
            <property name="tabsClosable">
             <bool>true</bool>
            </property>
@@ -521,7 +575,7 @@ background-color: rgb(66, 133, 255);
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(51, 109, 186);</string>
+    <string notr="true">background-color: rgb(231, 195, 44);</string>
    </property>
   </widget>
   <widget class="QToolBar" name="toolBar">
@@ -566,8 +620,8 @@ QToolButton:checked {
    </attribute>
    <addaction name="action_selectActor"/>
    <addaction name="action_selectVertex"/>
-   <addaction name="actionCutter"/>
-   <addaction name="actionclearSelection"/>
+   <addaction name="action_cutter"/>
+   <addaction name="action_clearSelection"/>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -585,8 +639,10 @@ QToolButton:checked {
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionImportMesh"/>
-    <addaction name="actionExportMesh"/>
+    <addaction name="action_importMesh"/>
+    <addaction name="action_exportMesh"/>
+    <addaction name="separator"/>
+    <addaction name="action_openExplorerFolder"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -596,7 +652,7 @@ QToolButton:checked {
      <property name="title">
       <string>Selection</string>
      </property>
-     <addaction name="actionclearSelection"/>
+     <addaction name="action_clearSelection"/>
     </widget>
     <addaction name="menuSelection"/>
    </widget>
@@ -610,8 +666,8 @@ QToolButton:checked {
     <property name="title">
      <string>UMTRI GUI</string>
     </property>
-    <addaction name="actionAbout"/>
-    <addaction name="actionPreferences"/>
+    <addaction name="action_about"/>
+    <addaction name="action_preferences"/>
    </widget>
    <addaction name="menuUMTRI_GUI"/>
    <addaction name="menuFile"/>
@@ -659,7 +715,7 @@ QToolButton:checked {
     <string>selectActor</string>
    </property>
   </action>
-  <action name="actionImportMesh">
+  <action name="action_importMesh">
    <property name="text">
     <string>Import Mesh...</string>
    </property>
@@ -670,7 +726,7 @@ QToolButton:checked {
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionExportMesh">
+  <action name="action_exportMesh">
    <property name="text">
     <string>Export Mesh...</string>
    </property>
@@ -678,7 +734,7 @@ QToolButton:checked {
     <string>Ctrl+E</string>
    </property>
   </action>
-  <action name="actionclearSelection">
+  <action name="action_clearSelection">
    <property name="icon">
     <iconset>
      <normaloff>res/clearSelection.png</normaloff>res/clearSelection.png</iconset>
@@ -692,12 +748,12 @@ QToolButton:checked {
     <string>Explorer</string>
    </property>
   </action>
-  <action name="actionAbout">
+  <action name="action_about">
    <property name="text">
     <string>About</string>
    </property>
   </action>
-  <action name="actionPreferences">
+  <action name="action_preferences">
    <property name="text">
     <string>Preferences...</string>
    </property>
@@ -705,17 +761,25 @@ QToolButton:checked {
     <string>Ctrl+,</string>
    </property>
   </action>
-  <action name="actionCutter">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
+  <action name="action_cutter">
    <property name="icon">
     <iconset>
-     <normaloff>res/select_off.png</normaloff>
-     <normalon>res/select_on.png</normalon>res/select_off.png</iconset>
+     <normaloff>res/select_on.png</normaloff>res/select_on.png</iconset>
    </property>
    <property name="text">
     <string>Cutter</string>
+   </property>
+  </action>
+  <action name="action_openExplorerFolder">
+   <property name="icon">
+    <iconset>
+     <normaloff>res/folder.png</normaloff>res/folder.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open Folder...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
    </property>
   </action>
  </widget>

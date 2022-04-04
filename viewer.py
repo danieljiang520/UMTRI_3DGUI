@@ -9,11 +9,13 @@
 # -----------------------------------------------------------
 
 # %% standard lib imports
+# from msilib.schema import Dialog
 from shutil import ReadError
 import sys, copy, time
 from pathlib import Path
 import os
 from cutter import *
+from settings import *
 # %% project-specific imports
 ## Qt + vtk widget
 from PyQt5.uic import loadUi
@@ -22,7 +24,9 @@ from PyQt5.QtWidgets import (
     QFileDialog,
     QApplication,
     QApplication,
-    QFileSystemModel
+    QFileSystemModel,
+    QTabBar,
+    QDialog
 )
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from PyQt5 import QtCore
@@ -107,7 +111,7 @@ class QIPythonWidget(RichIPythonWidget):
 
 # Main application window
 class MainWindow(QMainWindow):
-    inputPath = "" # absolute path to the input ply scan
+    # inputPath = "" # absolute path to the input ply scan
     outputPath = "" # absolute path to the output folder
     resultPath = "" # path to the most recent finished project ply file
     currentFolder = "" # path to current folder
@@ -119,18 +123,25 @@ class MainWindow(QMainWindow):
     def __init__(self,size):
         super(MainWindow, self).__init__()
 
+        self.settings = QtCore.QSettings('UMTRI','3DViewer')
+        print(self.settings.fileName())
+
         # load the components defined in th xml file
         loadUi("viewer_gui.ui", self)
         self.screenSize = size
 
         """ Connections for all elements in Mainwindow """
-        self.actionImportMesh.triggered.connect(self.getFilePath)
-        self.actionclearSelection.triggered.connect(self.clearScreen)
+        self.action_importMesh.triggered.connect(self.importMesh)
+        self.action_clearSelection.triggered.connect(self.clearScreen)
         self.action_selectVertex.toggled.connect(self.actionSelectVertex_state_changed)
         self.action_selectActor.toggled.connect(self.actionSelectActor_state_changed)
-        self.actionCutter.toggled.connect(self.actionCutter_state_changed)
-        self.toolButton_explorer.clicked.connect(self.getDirPath)
+        self.action_cutter.triggered.connect(self.actionCutter_state_changed)
+        self.action_openExplorerFolder.triggered.connect(self.setExplorerFolder)
+        self.action_preferences.triggered.connect(self.openSettings)
+        self.pushButton_settings.clicked.connect(self.openSettings)
+        self.toolButton_explorer.clicked.connect(self.setExplorerFolder)
         self.tabWidget.tabCloseRequested.connect(self.closeTab)
+        self.treeView_explorer.doubleClicked.connect(self.treeView_explorer_doubleClicked)
 
         """ Set up file explorer """
         parser = QtCore.QCommandLineParser()
@@ -162,6 +173,7 @@ class MainWindow(QMainWindow):
         """ Set up VTK widget """
         self.vtkWidget = QVTKRenderWindowInteractor()
         self.tabWidget.addTab(self.vtkWidget, "Main Viewer")
+        self.tabWidget.tabBar().tabButton(0, QTabBar.LeftSide).resize(0, 0) # Windows should be QTabBar.RightSide
 
         """ ipy console """
         self.ipyConsole = QIPythonWidget(customBanner="Welcome to the embedded ipython console\n")
@@ -179,6 +191,12 @@ class MainWindow(QMainWindow):
         # self.plt.addCallback('MouseMove', self.onMouseMove)
         self.plt.show(zoom=True)                  # <--- show the vedo rendering
 
+    def onClose(self):
+        #Disable the interactor before closing to prevent it
+        #from trying to act on already deleted items
+        printc("..calling onClose")
+        self.vtkWidget.close()
+
     def onRightClick(self, event):
         if(self.action_selectActor.isChecked()):
             self.selectActor(event)
@@ -188,53 +206,67 @@ class MainWindow(QMainWindow):
     def selectActor(self,event):
         if(not event.actor):
             return
-        i = event.at
+        # i = event.at
         printc("Left button pressed on 3D", event.picked3d, c='g')
         # adding a silhouette might cause some lags
         # self.plt += event.actor.silhouette().lineWidth(2).c('red')
         #an alternative solution
         self.actorSelection = event.actor.clone()
         self.actorSelection.c('red')
-        self.plt.at(i).add(self.actorSelection)
+        # self.plt.at(i).add(self.actorSelection)
+        self.plt.add(self.actorSelection)
 
     def selectVertex(self,event):
         if(not event.isPoints):
             return
-        i = event.at
+        # i = event.at
         printc("Left button pressed on 3D", event.picked3d, c='g')
         pt = Point(event.picked3d).c('pink').ps(12)
         self.vertexSelections.append(pt)
-        self.plt.at(i).add(pt)
+        # self.plt.at(i).add(pt)
+        self.plt.add(pt)
 
-    def onClose(self):
-        #Disable the interactor before closing to prevent it
-        #from trying to act on already deleted items
-        printc("..calling onClose")
-        self.vtkWidget.close()
+    def clearScreen(self):
+        if(len(self.vertexSelections)>0):
+            self.plt.clear(self.vertexSelections)
+        self.vertexSelections.clear()
+        self.plt.show()
+        print("Cleared screen!")
 
-    def getDirPath(self, setExplorer=True):
+    def getDirPath(self):
         """ getDirPath opens a file dialog and only allows the user to select folders """
-        print("opening folder prompt")
-        self.currentFolder = QFileDialog.getExistingDirectory(self, "Open Directory",
+        return QFileDialog.getExistingDirectory(self, "Open Directory",
                                                 os.getcwd(),
                                                 QFileDialog.ShowDirsOnly
                                                 | QFileDialog.DontResolveSymlinks)
-        if setExplorer:
-            self.treeView_explorer.setRootIndex(self.dirModel.index(self.currentFolder))
 
-    def getFilePath(self, button_state, load_file=True, display_result=True):
+    def getFilePath(self):
         """ open a file dialog and select a file """
-        self.inputPath = QFileDialog.getOpenFileName(self, 'Open File',
+        return QFileDialog.getOpenFileName(self, 'Open File',
          os.getcwd(), "Ply Files (*.ply);;OBJ Files (*.obj);;STL Files (*.stl)")[0]
 
-        print("got input path: ", self.inputPath)
-        if load_file:
-            if display_result:
-                print("displaying results...")
-                self.displayResult()
-        else:
-            print("load_file must not be true!", load_file)
-        return self.inputPath
+    def setExplorerFolder(self):
+        self.currentFolder = self.getDirPath()
+        self.treeView_explorer.setRootIndex(self.dirModel.index(self.currentFolder))
+
+    def importMesh(self,inputPath=""):
+        if (not inputPath):
+            inputPath = self.getFilePath()
+        if (not inputPath.lower().endswith(('.ply', '.obj', '.stl'))):
+            return
+        inputBaseName = os.path.basename(inputPath)
+        print("displaying ",inputBaseName)
+        m = Mesh(inputPath)
+        m.name = inputBaseName
+        self.objs.append(m)
+        self.plt.add(m)
+        self.plt.show(zoom=True)                 # <--- show the vedo rendering
+        objectTreeItem = QStandardItem(inputBaseName)
+        fileDirTreeItem = QStandardItem("File: "+inputPath)
+        numVerticesTreeItem = QStandardItem("Vertices: "+str(base.BaseActor.N(m)))
+        numFacesTreeItem = QStandardItem("Faces: "+str(base.BaseActor.NCells(m)))
+        objectTreeItem.appendRows([fileDirTreeItem,numVerticesTreeItem,numFacesTreeItem])
+        self.rootNode.appendRow(objectTreeItem)
 
     def actionSelectActor_state_changed(self):
         if(self.action_selectActor.isChecked()):
@@ -245,31 +277,26 @@ class MainWindow(QMainWindow):
             self.action_selectActor.setChecked(False)
 
     def actionCutter_state_changed(self):
-        if(self.actionCutter.isChecked()):
-            self.cutterWidget = QVTKRenderWindowInteractor()
-            self.tabWidget.addTab(self.cutterWidget, "Cutter Viewer")
-            FreeHandCutPlotter(mesh=self.m, qtWidget=self.cutterWidget).start()
-            self.tabWidget.setCurrentWidget(self.cutterWidget)
+        if(len(self.objs)<1): return
+        self.cutterWidget = QVTKRenderWindowInteractor()
+        self.tabWidget.addTab(self.cutterWidget, "Cutter Viewer")
+        FreeHandCutPlotter(mesh=self.objs[0], qtWidget=self.cutterWidget).start()
+        self.tabWidget.setCurrentWidget(self.cutterWidget)
 
     def closeTab(self,index):
         self.tabWidget.removeTab(index)
 
-    def clearScreen(self):
-        self.plt.clear(self.vertexSelections)
-        self.plt.show()
-        print("Cleared screen!")
+    def treeView_explorer_doubleClicked(self,index):
+        item =index.model().filePath(index)
+        self.importMesh(item)
 
-    def displayResult(self):
-        self.m = Mesh(self.inputPath)
-        self.objs.append(self.m)
-        self.plt.add(self.m)
-        self.plt.show(zoom=True)                 # <--- show the vedo rendering
-        objectTreeItem = QStandardItem(os.path.basename(self.inputPath))
-        fileDirTreeItem = QStandardItem("File: "+self.inputPath)
-        numVerticesTreeItem = QStandardItem("Vertices: "+str(base.BaseActor.N(self.m)))
-        numFacesTreeItem = QStandardItem("Faces: "+str(base.BaseActor.NCells(self.m)))
-        objectTreeItem.appendRows([fileDirTreeItem,numVerticesTreeItem,numFacesTreeItem])
-        self.rootNode.appendRow(objectTreeItem)
+    def openSettings(self):
+        dialog = QDialog()
+        dialog.ui = Settings()
+        dialog.ui.setupUi(dialog)
+        dialog.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        dialog.exec_()
+
 
 #-------------------------------------------------------------------------------------------------
 # %% Main
