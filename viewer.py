@@ -26,7 +26,8 @@ from PyQt5.QtWidgets import (
     QApplication,
     QFileSystemModel,
     QTabBar,
-    QDialog
+    QDialog,
+    QAbstractItemView
 )
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from PyQt5 import QtCore
@@ -156,6 +157,7 @@ class MainWindow(QMainWindow):
 
         """ Set up tree view for file explorer """
         self.dirModel.setRootPath(QtCore.QDir.currentPath())
+        self.treeView_explorer.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.treeView_explorer.setModel(self.dirModel)
         self.treeView_explorer.setRootIndex(self.dirModel.index(QtCore.QDir.currentPath()))
         # availableSize = QtCore.QSize(self.tree.screen().availableGeometry().size())
@@ -287,6 +289,8 @@ class MainWindow(QMainWindow):
         self.tabWidget.removeTab(index)
 
     def treeView_explorer_doubleClicked(self,index):
+        indexes = self.treeView_explorer.selectionModel().selectedIndexes()
+        # print(indexes)
         item =index.model().filePath(index)
         self.importMesh(item)
 

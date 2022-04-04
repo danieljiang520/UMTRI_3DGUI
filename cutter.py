@@ -1,5 +1,18 @@
 
-from vedo import *
+## vedo
+from vedo import (
+    Plotter,
+    Line,
+    np,
+    Spline,
+    logger,
+    Points,
+    os,
+    mag,
+    Text2D,
+    Ribbon,
+    fitPlane
+)
 class FreeHandCutPlotter(Plotter):
     """
     A ``Plotter`` derived class which edits polygonal meshes interactively.
@@ -59,12 +72,12 @@ class FreeHandCutPlotter(Plotter):
             self,
             mesh,
             splined=True,
-            font="Bongas",
-            alpha=0.9,
-            lw=4,
-            lc="red5",
-            pc="red4",
-            c="green3",
+            font="Arial",
+            alpha=0.8,
+            lw=2,
+            lc="black1",
+            pc="black1",
+            c="blue3",
             tc="k9",
             tol=0.008,
             **kwargs
@@ -91,7 +104,7 @@ class FreeHandCutPlotter(Plotter):
         self.msg += "Press L to extract largest surface\n"
         self.msg += "        z/Z to cut mesh (s to save)\n"
         self.msg += "        c to clear points, u to undo"
-        self.txt2d = Text2D(self.msg, pos='top-left', font=font, s=0.9)
+        self.txt2d = Text2D(self.msg, pos='top-left', font=font, s=0.5)
         self.txt2d.c(tc).background(c, alpha).frame()
 
         self.idkeypress = self.addCallback('KeyPress', self._onKeyPress)

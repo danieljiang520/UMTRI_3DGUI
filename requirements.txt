@@ -1,5 +1,4 @@
-ipython==7.32.0
 PyQt5==5.15.6
 qtconsole==5.2.2
-vedo==2022.0.1
+vedo==2022.1.0
 vtk==8.1.2
