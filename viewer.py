@@ -13,7 +13,7 @@ from shutil import ReadError
 import sys, copy, time
 from pathlib import Path
 import os
-
+from cutter import *
 # %% project-specific imports
 ## Qt + vtk widget
 from PyQt5.uic import loadUi
@@ -34,15 +34,10 @@ from vedo import (
     printc,
     Mesh,
     base,
-    Point,
-    Points,
-    Line,
-    Ribbon,
-    fitPlane,
-    Text2D
+    Point
 )
 from vedo.cli import exe_info
-from vedo.applications import FreeHandCutPlotter
+# from vedo.applications import FreeHandCutPlotter
 
 ## iPython
 # These for embeded pythion console
@@ -116,13 +111,10 @@ class MainWindow(QMainWindow):
     outputPath = "" # absolute path to the output folder
     resultPath = "" # path to the most recent finished project ply file
     currentFolder = "" # path to current folder
-    vertexSelections = [None]
+    vertexSelections = []
     actorSelection = None
+    objs = []
     dirModel = QFileSystemModel()
-    selectMode = False
-    selectedCpoints = []
-    selectedPoints = None
-    spline = None
 
     def __init__(self,size):
         super(MainWindow, self).__init__()
@@ -136,8 +128,9 @@ class MainWindow(QMainWindow):
         self.actionclearSelection.triggered.connect(self.clearScreen)
         self.action_selectVertex.toggled.connect(self.actionSelectVertex_state_changed)
         self.action_selectActor.toggled.connect(self.actionSelectActor_state_changed)
-        # self.actionCutter.toggled.connect(self.actionCutter_state_changed)
+        self.actionCutter.toggled.connect(self.actionCutter_state_changed)
         self.toolButton_explorer.clicked.connect(self.getDirPath)
+        self.tabWidget.tabCloseRequested.connect(self.closeTab)
 
         """ Set up file explorer """
         parser = QtCore.QCommandLineParser()
@@ -168,7 +161,7 @@ class MainWindow(QMainWindow):
 
         """ Set up VTK widget """
         self.vtkWidget = QVTKRenderWindowInteractor()
-        self.splitter_viewer.addWidget(self.vtkWidget)
+        self.tabWidget.addTab(self.vtkWidget, "Main Viewer")
 
         """ ipy console """
         self.ipyConsole = QIPythonWidget(customBanner="Welcome to the embedded ipython console\n")
@@ -182,8 +175,8 @@ class MainWindow(QMainWindow):
         """ Create renderer and add the vedo objects and callbacks """
         self.plt = Plotter(qtWidget=self.vtkWidget,bg='DarkSlateBlue',bg2='MidnightBlue',screensize=(1792,1120))
         self.plt.addCallback("RightButtonPress", self.onRightClick)
-        self.plt.addCallback("key press", self.onKeyPress)
-        self.plt.addCallback('MouseMove', self.onMouseMove)
+        # self.plt.addCallback("key press", self.onKeyPress)
+        # self.plt.addCallback('MouseMove', self.onMouseMove)
         self.plt.show(zoom=True)                  # <--- show the vedo rendering
 
     def onRightClick(self, event):
@@ -191,29 +184,6 @@ class MainWindow(QMainWindow):
             self.selectActor(event)
         elif(self.action_selectVertex.isChecked()):
             self.selectVertex(event)
-        elif(self.actionCutter.isChecked()):
-            self.selectMode = not self.selectMode # toggle mode
-
-    def onMouseMove(self, evt):
-        if self.selectMode:
-            self.plt.remove([self.selectedPoints, self.spline])
-            cpt = self.plt.computeWorldPosition(evt.picked2d) # make this 2d-screen point 3d
-            self.selectedCpoints.append(cpt)
-            self.selectedPoints = Points(self.selectedCpoints, r=8).c('black')
-            if len(self.selectedCpoints) > 2:
-                self.spline = Line(self.selectedCpoints, closed=True).lw(5).c('red5')
-                self.plt.add([self.selectedPoints, self.spline])
-
-    def onKeyPress(self, evt):
-        if evt.keyPressed == 'z' and self.spline:       # cut mesh with a ribbon-like surface
-            printc("Cutting the mesh please wait..", invert=True)
-            tol = self.m.diagonalSize()/2            # size of ribbon
-            pts = self.spline.points()
-            n = fitPlane(pts, signed=True).normal  # compute normal vector to points
-            rib = Ribbon(pts - tol*n, pts + tol*n, closed=True)
-            self.m.cutWithMesh(rib)
-            self.plt.remove([self.spline, self.selectedPoints]).render()
-            self.selectedCpoints, self.selectedPoints, self.spline = [], None, None
 
     def selectActor(self,event):
         if(not event.actor):
@@ -274,6 +244,16 @@ class MainWindow(QMainWindow):
         if(self.action_selectVertex.isChecked()):
             self.action_selectActor.setChecked(False)
 
+    def actionCutter_state_changed(self):
+        if(self.actionCutter.isChecked()):
+            self.cutterWidget = QVTKRenderWindowInteractor()
+            self.tabWidget.addTab(self.cutterWidget, "Cutter Viewer")
+            FreeHandCutPlotter(mesh=self.m, qtWidget=self.cutterWidget).start()
+            self.tabWidget.setCurrentWidget(self.cutterWidget)
+
+    def closeTab(self,index):
+        self.tabWidget.removeTab(index)
+
     def clearScreen(self):
         self.plt.clear(self.vertexSelections)
         self.plt.show()
@@ -281,6 +261,7 @@ class MainWindow(QMainWindow):
 
     def displayResult(self):
         self.m = Mesh(self.inputPath)
+        self.objs.append(self.m)
         self.plt.add(self.m)
         self.plt.show(zoom=True)                 # <--- show the vedo rendering
         objectTreeItem = QStandardItem(os.path.basename(self.inputPath))
