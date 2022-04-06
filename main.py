@@ -15,7 +15,7 @@ import sys, copy, time
 from pathlib import Path
 import os
 from cutter import *
-from settings import *
+from SettingsDialog import *
 # %% project-specific imports
 ## Qt + vtk widget
 from PyQt5.uic import loadUi
@@ -113,23 +113,25 @@ class QIPythonWidget(RichIPythonWidget):
 # Main application window
 class MainWindow(QMainWindow):
     # inputPath = "" # absolute path to the input ply scan
-    outputPath = "" # absolute path to the output folder
-    resultPath = "" # path to the most recent finished project ply file
-    currentFolder = "" # path to current folder
+    # outputPath = "" # absolute path to the output folder
+    # resultPath = "" # path to the most recent finished project ply file
+    currentFolder = ""
     vertexSelections = []
     actorSelection = None
     objs = []
     dirModel = QFileSystemModel()
 
-    def __init__(self,size):
+    def __init__(self):
         super(MainWindow, self).__init__()
-
-        self.settings = QtCore.QSettings('UMTRI','3DViewer')
-        print(self.settings.fileName())
 
         # load the components defined in th xml file
         loadUi("viewer_gui.ui", self)
-        self.screenSize = size
+
+        # Load settings
+        self.settings = QtCore.QSettings('UMTRI','3DViewer')
+
+        # print(self.settings.fileName())
+
 
         """ Connections for all elements in Mainwindow """
         self.action_importMesh.triggered.connect(self.importMesh)
@@ -160,9 +162,6 @@ class MainWindow(QMainWindow):
         self.treeView_explorer.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.treeView_explorer.setModel(self.dirModel)
         self.treeView_explorer.setRootIndex(self.dirModel.index(QtCore.QDir.currentPath()))
-        # availableSize = QtCore.QSize(self.tree.screen().availableGeometry().size())
-        # self.tree.resize(availableSize / 2)
-        # self.tree.setColumnWidth(0, int(self.tree.width() / 3))
         self.treeView_explorer.hideColumn(1)
         self.treeView_explorer.hideColumn(2)
         self.treeView_explorer.hideColumn(3)
@@ -192,6 +191,33 @@ class MainWindow(QMainWindow):
         # self.plt.addCallback("key press", self.onKeyPress)
         # self.plt.addCallback('MouseMove', self.onMouseMove)
         self.plt.show(zoom=True)                  # <--- show the vedo rendering
+
+        self.applySettings()
+
+    def applySettings(self):
+        try:
+            if(self.settings.value('useLastWindowSizePosition')):
+                self.resize(self.settings.value('window size'))
+                self.move(self.settings.value('window position'))
+
+            if(self.settings.value('alwaysLastFolder')):
+                self.setExplorerFolder2(self.settings.value('last folder path'))
+            elif(self.settings.value('alwaysCurrentFolder')):
+                self.setExplorerFolder2(QtCore.QDir.currentPath())
+            elif(len(self.settings.value('default explorer folder'))<1):
+                self.setExplorerFolder2(QtCore.QDir.currentPath())
+            else:
+                self.setExplorerFolder2(self.settings.value('default folder'))
+        except:
+            pass
+
+    def updateSettings(self):
+        self.settings.setValue('window size',self.size())
+        self.settings.setValue('window position',self.pos())
+        self.settings.setValue('last folder path',self.currentFolder)
+
+    def closeEvent(self, event):
+        self.updateSettings()
 
     def onClose(self):
         #Disable the interactor before closing to prevent it
@@ -248,8 +274,12 @@ class MainWindow(QMainWindow):
          os.getcwd(), "Ply Files (*.ply);;OBJ Files (*.obj);;STL Files (*.stl)")[0]
 
     def setExplorerFolder(self):
-        self.currentFolder = self.getDirPath()
-        self.treeView_explorer.setRootIndex(self.dirModel.index(self.currentFolder))
+        folderPath = self.getDirPath()
+        self.treeView_explorer.setRootIndex(self.dirModel.index(folderPath))
+        self.currentFolder = folderPath
+    def setExplorerFolder2(self,folderPath):
+        self.treeView_explorer.setRootIndex(self.dirModel.index(folderPath))
+        self.currentFolder = folderPath
 
     def importMesh(self,inputPath=""):
         if (not inputPath):
@@ -295,11 +325,11 @@ class MainWindow(QMainWindow):
         self.importMesh(item)
 
     def openSettings(self):
-        dialog = QDialog()
-        dialog.ui = Settings()
-        dialog.ui.setupUi(dialog)
-        dialog.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        dialog.exec_()
+        default_settings = self.settings
+
+        settings_dialog = SettingsDialog(default_settings)
+        if(settings_dialog.exec()):
+            self.settings = settings_dialog.settings
 
 
 #-------------------------------------------------------------------------------------------------
@@ -314,6 +344,6 @@ if __name__ == "__main__":
     print('Screen: %s' % screen.name())
     print('Size: %d x %d' % (size.width(), size.height()))
 
-    mainwindow = MainWindow(size)
+    mainwindow = MainWindow()
     mainwindow.show()
     sys.exit(app.exec())
