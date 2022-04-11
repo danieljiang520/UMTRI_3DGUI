@@ -6,6 +6,8 @@ This is a graphical user interface tool for processing 3D kinect scan files. It 
 
 It works on macOS Mojave 10.14 or higher.
 
+![Screen Shot 2022-04-10 at 23 44 38](https://user-images.githubusercontent.com/71047773/162662788-558debef-61e3-456a-8ab5-2774afd442c2.png)
+
 * [Features](#features)
 * [Usage](#usage)
 * [Motivation](#motivation)
