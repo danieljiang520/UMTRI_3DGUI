@@ -26,11 +26,12 @@ from PyQt5.QtWidgets import (
     QApplication,
     QFileSystemModel,
     QTabBar,
-    QDialog,
-    QAbstractItemView
+    QAbstractItemView,
+    QMenu,
+    QAction
 )
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui
 from PyQt5.Qt import QStandardItemModel, QStandardItem
 
 ## vedo
@@ -112,9 +113,6 @@ class QIPythonWidget(RichIPythonWidget):
 
 # Main application window
 class MainWindow(QMainWindow):
-    # inputPath = "" # absolute path to the input ply scan
-    # outputPath = "" # absolute path to the output folder
-    # resultPath = "" # path to the most recent finished project ply file
     currentFolder = ""
     vertexSelections = []
     actorSelection = None
@@ -188,11 +186,10 @@ class MainWindow(QMainWindow):
 
         """ Create renderer and add the vedo objects and callbacks """
         self.plt = Plotter(qtWidget=self.vtkWidget,bg='DarkSlateBlue',bg2='MidnightBlue',screensize=(1792,1120))
-        self.plt.addCallback("RightButtonPress", self.onRightClick)
+        self.plt.addCallback("LeftButtonPress", self.onLeftClick)
         # self.plt.addCallback("key press", self.onKeyPress)
         # self.plt.addCallback('MouseMove', self.onMouseMove)
         self.plt.show(zoom=True)                  # <--- show the vedo rendering
-
         self.applySettings()
 
     def applySettings(self):
@@ -226,11 +223,15 @@ class MainWindow(QMainWindow):
         printc("..calling onClose")
         self.vtkWidget.close()
 
-    def onRightClick(self, event):
+    def onLeftClick(self, event):
         if(self.action_selectActor.isChecked()):
             self.selectActor(event)
         elif(self.action_selectVertex.isChecked()):
             self.selectVertex(event)
+
+    def onRightClick(self, event):
+        if(not event.actor):
+            return
 
     def selectActor(self,event):
         if(not event.actor):
@@ -243,7 +244,8 @@ class MainWindow(QMainWindow):
         self.actorSelection = event.actor.clone()
         self.actorSelection.c('red')
         # self.plt.at(i).add(self.actorSelection)
-        self.plt.add(self.actorSelection)
+        # self.plt.add(self.actorSelection)
+        self.displayPlotter()
 
     def selectVertex(self,event):
         if(not event.isPoints):
@@ -253,7 +255,8 @@ class MainWindow(QMainWindow):
         pt = Point(event.picked3d).c('pink').ps(12)
         self.vertexSelections.append(pt)
         # self.plt.at(i).add(pt)
-        self.plt.add(pt)
+        # self.plt.add(pt)
+        self.displayPlotter()
 
     def clearScreen(self):
         if(len(self.vertexSelections)>0):
@@ -292,14 +295,18 @@ class MainWindow(QMainWindow):
         m = Mesh(inputPath)
         m.name = inputBaseName
         self.objs.append(m)
-        self.plt.add(m)
-        self.plt.show(zoom=True)                 # <--- show the vedo rendering
+        # self.plt.add(m)
+        # self.plt.show(zoom=True)                 # <--- show the vedo rendering
         objectTreeItem = QStandardItem(inputBaseName)
         fileDirTreeItem = QStandardItem("File: "+inputPath)
         numVerticesTreeItem = QStandardItem("Vertices: "+str(base.BaseActor.N(m)))
         numFacesTreeItem = QStandardItem("Faces: "+str(base.BaseActor.NCells(m)))
         objectTreeItem.appendRows([fileDirTreeItem,numVerticesTreeItem,numFacesTreeItem])
         self.rootNode.appendRow(objectTreeItem)
+        self.displayPlotter()
+
+    def displayPlotter(self):
+        self.plt.show(self.objs, self.actorSelection, self.vertexSelections, zoom=True)        # <--- show the vedo rendering
 
     def actionSelectActor_state_changed(self):
         if(self.action_selectActor.isChecked()):
@@ -331,6 +338,19 @@ class MainWindow(QMainWindow):
         settings_dialog = SettingsDialog(default_settings)
         if(settings_dialog.exec()):
             self.settings = settings_dialog.settings
+
+    def contextMenuEvent(self, event):
+        self.menu = QMenu(self)
+
+        renameAction = QAction('Show/Hide Object', self)
+        renameAction.triggered.connect(lambda: self.showHideActor(event))
+        self.menu.addAction(renameAction)
+        # add other required actions
+        self.menu.popup(QtGui.QCursor.pos())
+
+    def showHideActor(self):
+        pass
+
 
 
 #-------------------------------------------------------------------------------------------------
