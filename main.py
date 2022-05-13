@@ -173,6 +173,7 @@ class MainWindow(QMainWindow):
 
         """ Set up VTK widget """
         self.vtkWidget = QVTKRenderWindowInteractor()
+        self.vtkWidget._getPixelRatio = lambda: 1 # A hacky way to resolve vtk widget screen resolution bug
         self.tabWidget.addTab(self.vtkWidget, "Main Viewer")
         self.tabWidget.tabBar().tabButton(0, QTabBar.LeftSide).resize(0, 0) # Windows should be QTabBar.RightSide
 
