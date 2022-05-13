@@ -1,4 +1,4 @@
-<img width="128px" src="https://user-images.githubusercontent.com/71047773/162662358-ffb2eb63-b276-4d6d-9697-72039558f0ba.png" alt="Logo" align="left" />
+<img width="128px" src="https://user-images.githubusercontent.com/71047773/168297191-f4e0f89e-0150-48fd-881a-5caa51cdcc38.png" alt="Logo" align="left" />
 
 # UMTRI 3D GUI
 
