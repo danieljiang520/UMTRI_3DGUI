@@ -11,8 +11,6 @@
 # %% standard lib imports
 # from msilib.schema import Dialog
 # from shutil import ReadError
-import imp
-from ui_viewer_gui import Ui_MainWindow
 import sys, copy, time
 # from pathlib import Path
 import os
@@ -114,7 +112,7 @@ class QIPythonWidget(RichIPythonWidget):
         self._execute(command,False)
 
 # Main application window
-class MainWindow(Ui_MainWindow):
+class MainWindow(QMainWindow):
     currentFolder = ""
     vertexSelections = []
     actorSelection = None
