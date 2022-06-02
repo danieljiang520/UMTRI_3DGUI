@@ -10,9 +10,11 @@
 
 # %% standard lib imports
 # from msilib.schema import Dialog
-from shutil import ReadError
+# from shutil import ReadError
+import imp
+from ui_viewer_gui import Ui_MainWindow
 import sys, copy, time
-from pathlib import Path
+# from pathlib import Path
 import os
 from cutter import *
 from SettingsDialog import *
@@ -112,7 +114,7 @@ class QIPythonWidget(RichIPythonWidget):
         self._execute(command,False)
 
 # Main application window
-class MainWindow(QMainWindow):
+class MainWindow(Ui_MainWindow):
     currentFolder = ""
     vertexSelections = []
     actorSelection = None
@@ -139,7 +141,6 @@ class MainWindow(QMainWindow):
         self.action_cutter.triggered.connect(self.actionCutter_state_changed)
         self.action_openExplorerFolder.triggered.connect(self.setExplorerFolder)
         self.action_preferences.triggered.connect(self.openSettings)
-        self.pushButton_settings.clicked.connect(self.openSettings)
         self.toolButton_explorer.clicked.connect(self.setExplorerFolder)
         self.tabWidget.tabCloseRequested.connect(self.closeTab)
         self.treeView_explorer.doubleClicked.connect(self.treeView_explorer_doubleClicked)
@@ -339,17 +340,17 @@ class MainWindow(QMainWindow):
         if(settings_dialog.exec()):
             self.settings = settings_dialog.settings
 
-    def contextMenuEvent(self, event):
-        self.menu = QMenu(self)
+    # def contextMenuEvent(self, event):
+    #     self.menu = QMenu(self)
 
-        renameAction = QAction('Show/Hide Object', self)
-        renameAction.triggered.connect(lambda: self.showHideActor(event))
-        self.menu.addAction(renameAction)
-        # add other required actions
-        self.menu.popup(QtGui.QCursor.pos())
+    #     renameAction = QAction('Show/Hide Object', self)
+    #     renameAction.triggered.connect(lambda: self.showHideActor(event))
+    #     self.menu.addAction(renameAction)
+    #     # add other required actions
+    #     self.menu.popup(QtGui.QCursor.pos())
 
-    def showHideActor(self):
-        pass
+    # def showHideActor(self):
+    #     pass
 
 
 
