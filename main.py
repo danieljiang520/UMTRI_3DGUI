@@ -139,7 +139,6 @@ class MainWindow(QMainWindow):
         self.action_cutter.triggered.connect(self.actionCutter_state_changed)
         self.action_openExplorerFolder.triggered.connect(self.setExplorerFolder)
         self.action_preferences.triggered.connect(self.openSettings)
-        self.actionMonitor.triggered.connect(self.openMonitor)
         self.toolButton_explorer.clicked.connect(self.setExplorerFolder)
         self.tabWidget.tabCloseRequested.connect(self.closeTab)
         self.treeView_explorer.doubleClicked.connect(self.treeView_explorer_doubleClicked)
@@ -338,12 +337,6 @@ class MainWindow(QMainWindow):
         settings_dialog = SettingsDialog(default_settings)
         if(settings_dialog.exec()):
             self.settings = settings_dialog.settings
-
-    def openMonitor(self):
-        text = Text2D("  Happy Birthday!  ", pos='middle', font="Times", s=5)
-        # text.background('blue8')
-        self.plt += text
-        self.plt.show()
 
     # def contextMenuEvent(self, event):
     #     self.menu = QMenu(self)
