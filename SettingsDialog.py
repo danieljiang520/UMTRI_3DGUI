@@ -19,10 +19,13 @@ class SettingsDialog(QDialog):
         self.pushButton_changeDefaultFolder.clicked.connect(self.setDefaultExplorerFolder)
 
     def applySettings(self):
-        self.checkBox_useLastWindowSizeAndPosition.setChecked(self.settings.value('useLastWindowSizePosition'))
-        self.checkBox_useLastWindowSizeAndPosition.setChecked(self.settings.value('useLastWindowSizePosition'))
-        self.checkBox_useLastWindowSizeAndPosition.setChecked(self.settings.value('useLastWindowSizePosition'))
-        self.label_explorerFolder.setText(self.settings.value('default explorer folder'))
+        try:
+            self.checkBox_useLastWindowSizeAndPosition.setChecked(self.settings.value('useLastWindowSizePosition'))
+            self.checkBox_alwaysLastFolder.setChecked(self.settings.value('alwaysLastFolder'))
+            self.checkBox_alwaysCurrentDir.setChecked(self.settings.value('alwaysCurrentFolder'))
+            self.label_explorerFolder.setText(self.settings.value('default explorer folder'))
+        except:
+            pass
 
     def checkBox_useLastWindowSizeAndPosition_state_changed(self):
         self.settings.setValue('useLastWindowSizePosition', self.checkBox_useLastWindowSizeAndPosition.isChecked())
