@@ -9,12 +9,8 @@
 # -----------------------------------------------------------
 
 # %% standard lib imports
-# from msilib.schema import Dialog
-# from shutil import ReadError
-import sys, copy, time
-# from pathlib import Path
+import sys
 import os
-from cutter import *
 from SettingsDialog import *
 # %% project-specific imports
 ## Qt + vtk widget
@@ -26,12 +22,10 @@ from PyQt5.QtWidgets import (
     QApplication,
     QFileSystemModel,
     QTabBar,
-    QAbstractItemView,
-    QMenu,
-    QAction
+    QAbstractItemView
 )
 from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore
 from PyQt5.Qt import QStandardItemModel, QStandardItem
 
 ## vedo
@@ -42,8 +36,6 @@ from vedo import (
     base,
     Point
 )
-from vedo.cli import exe_info
-# from vedo.applications import FreeHandCutPlotter
 
 ## iPython
 # These for embeded pythion console
@@ -51,12 +43,10 @@ os.environ['QT_API'] = 'pyqt5'
 # iPython won't work if this is not correctly installed. And the error message will be misleading
 # from IPython.qt.console.rich_ipython_widget import RichIPythonWidget # deprecated
 from qtconsole.rich_ipython_widget import RichIPythonWidget
-# from IPython.qt.inprocess import QtInProcessKernelManager
 
 ## qtconsole
 # these are updated based on error messages
 from qtconsole.inprocess import QtInProcessKernelManager
-# from qtconsole import rich_ipython_widget
 
 #-------------------------------------------------------------------------------------------------
 # %% Functions
@@ -128,15 +118,11 @@ class MainWindow(QMainWindow):
         # Load settings
         self.settings = QtCore.QSettings('UMTRI','3DViewer')
 
-        # print(self.settings.fileName())
-
-
         """ Connections for all elements in Mainwindow """
         self.action_importMesh.triggered.connect(self.importMesh)
         self.action_clearSelection.triggered.connect(self.clearScreen)
         self.action_selectVertex.toggled.connect(self.actionSelectVertex_state_changed)
         self.action_selectActor.toggled.connect(self.actionSelectActor_state_changed)
-        self.action_cutter.triggered.connect(self.actionCutter_state_changed)
         self.action_openExplorerFolder.triggered.connect(self.setExplorerFolder)
         self.action_preferences.triggered.connect(self.openSettings)
         self.toolButton_explorer.clicked.connect(self.setExplorerFolder)
@@ -184,7 +170,7 @@ class MainWindow(QMainWindow):
                 \n ipyConsole.pushVariables({\"foo\":43,\"print_process_id\":print_process_id})")
 
         """ Create renderer and add the vedo objects and callbacks """
-        self.plt = Plotter(qtWidget=self.vtkWidget,bg='DarkSlateBlue',bg2='MidnightBlue',screensize=(1792,1120))
+        self.plt = Plotter(bg='DarkSlateBlue',bg2='MidnightBlue',qtWidget=self.vtkWidget,)
         self.plt.addCallback("LeftButtonPress", self.onLeftClick)
         # self.plt.addCallback("key press", self.onKeyPress)
         # self.plt.addCallback('MouseMove', self.onMouseMove)
@@ -315,13 +301,6 @@ class MainWindow(QMainWindow):
         if(self.action_selectVertex.isChecked()):
             self.action_selectActor.setChecked(False)
 
-    def actionCutter_state_changed(self):
-        if(len(self.objs)<1): return
-        self.cutterWidget = QVTKRenderWindowInteractor()
-        self.tabWidget.addTab(self.cutterWidget, "Cutter Viewer")
-        FreeHandCutPlotter(mesh=self.objs[0], qtWidget=self.cutterWidget).start()
-        self.tabWidget.setCurrentWidget(self.cutterWidget)
-
     def closeTab(self,index):
         self.tabWidget.removeTab(index)
 
@@ -338,25 +317,11 @@ class MainWindow(QMainWindow):
         if(settings_dialog.exec()):
             self.settings = settings_dialog.settings
 
-    # def contextMenuEvent(self, event):
-    #     self.menu = QMenu(self)
-
-    #     renameAction = QAction('Show/Hide Object', self)
-    #     renameAction.triggered.connect(lambda: self.showHideActor(event))
-    #     self.menu.addAction(renameAction)
-    #     # add other required actions
-    #     self.menu.popup(QtGui.QCursor.pos())
-
-    # def showHideActor(self):
-    #     pass
-
 
 
 #-------------------------------------------------------------------------------------------------
 # %% Main
 if __name__ == "__main__":
-
-    exe_info([]) # will dump some info about the system
 
     app = QApplication(sys.argv)
     screen = app.primaryScreen()
