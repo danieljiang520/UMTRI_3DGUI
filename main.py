@@ -170,10 +170,10 @@ class MainWindow(QMainWindow):
                 \n ipyConsole.pushVariables({\"foo\":43,\"print_process_id\":print_process_id})")
 
         """ Create renderer and add the vedo objects and callbacks """
-        self.plt = Plotter(bg='DarkSlateBlue',bg2='MidnightBlue',qtWidget=self.vtkWidget,)
-        self.plt.addCallback("LeftButtonPress", self.onLeftClick)
-        # self.plt.addCallback("key press", self.onKeyPress)
-        # self.plt.addCallback('MouseMove', self.onMouseMove)
+        self.plt = Plotter(bg='DarkSlateBlue',bg2='MidnightBlue',qt_widget=self.vtkWidget)
+        self.plt.add_callback("LeftButtonPress", self.onLeftClick)
+        # self.plt.add_callback("key press", self.onKeyPress)
+        # self.plt.add_callback('MouseMove', self.onMouseMove)
         self.plt.show(zoom=True)                  # <--- show the vedo rendering
         self.applySettings()
 
