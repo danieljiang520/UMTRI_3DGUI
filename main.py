@@ -12,6 +12,7 @@
 import sys
 import os
 from SettingsDialog import *
+
 # %% project-specific imports
 ## Qt + vtk widget
 from PyQt5.uic import loadUi
@@ -24,7 +25,8 @@ from PyQt5.QtWidgets import (
     QTabBar,
     QAbstractItemView
 )
-from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+
+from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from PyQt5 import QtCore
 from PyQt5.Qt import QStandardItemModel, QStandardItem
 
