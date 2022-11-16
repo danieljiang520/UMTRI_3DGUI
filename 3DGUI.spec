@@ -8,8 +8,7 @@ block_cipher = None
 a = Analysis(['main.py'],
              pathex=[site_packages, '.'],
              binaries=[],
-             datas=[(path.join(site_packages,"vtkmodules"), "vtkmodules"),
-                    (path.join(site_packages,"vedo"), "vedo")],
+             datas=[],
              hiddenimports=['vtkmodules'],
              hookspath=[],
              runtime_hooks=[],
@@ -40,11 +39,13 @@ def extra_datas(mydir):
 # append the 'data' dir
 a.datas += extra_datas('fonts')
 a.datas += extra_datas('res')
+# print(a.datas)
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 exe = EXE(
     pyz,
     a.scripts,
+    a.datas,
     [],
     exclude_binaries=True,
     name='3DGUI',
