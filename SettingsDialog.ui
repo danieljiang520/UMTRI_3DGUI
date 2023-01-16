@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>660</width>
+    <height>321</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(35, 35, 35);color: rgb(255, 255, 255);</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QWidget" name="widget" native="true">
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(51, 51, 51);</string>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>6</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>6</number>
+      </property>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButton_general">
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QToolButton{
+	border : 0px;
+	color: rgb(126, 127, 130);
+}
+QToolButton::checked{
+	color: rgb(28, 112, 205);
+}</string>
+        </property>
+        <property name="text">
+         <string>General</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>res/settings_empty_off.png</normaloff>
+          <activeon>res/settings_empty_on.png</activeon>res/settings_empty_off.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextUnderIcon</enum>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButton_appearance">
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QToolButton{
+	border : 0px;
+	color: rgb(126, 127, 130);
+}
+QToolButton::checked{
+	color: rgb(28, 112, 205);
+}</string>
+        </property>
+        <property name="text">
+         <string>Appearance</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>res/appearance_off.png</normaloff>
+          <activeon>res/appearance_on.png</activeon>res/appearance_off.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButton_advanced">
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QToolButton{
+	border : 0px;
+	color: rgb(126, 127, 130);
+}
+QToolButton::checked{
+	color: rgb(28, 112, 205);
+}</string>
+        </property>
+        <property name="text">
+         <string>Advanced</string>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>res/advanced_off.png</normaloff>
+          <activeon>res/advanced_on.png</activeon>res/advanced_off.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextUnderIcon</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QStackedWidget" name="stackedWidget">
+     <widget class="QWidget" name="page">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QGridLayout" name="gridLayout_2">
+         <item row="2" column="1">
+          <widget class="QCheckBox" name="checkBox_alwaysCurrentDir">
+           <property name="text">
+            <string>Always open current directory</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_explorerFolder">
+           <property name="text">
+            <string>path</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Explorer Folder:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QPushButton" name="pushButton_changeDefaultFolder">
+           <property name="styleSheet">
+            <string notr="true">QPushButton:hover{
+	
+	background-color: rgb(166, 166, 166);
+}
+QPushButton{
+	border: 0px;
+	
+	background-color: rgb(78, 78, 78);
+}</string>
+           </property>
+           <property name="text">
+            <string>Change Default Explorer Folder</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QCheckBox" name="checkBox_alwaysLastFolder">
+           <property name="text">
+            <string>Always open folder from last session</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Size:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QCheckBox" name="checkBox_useLastWindowSizeAndPosition">
+           <property name="text">
+            <string>Remember window size and position constraints</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_2"/>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
