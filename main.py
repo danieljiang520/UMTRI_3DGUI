@@ -26,7 +26,7 @@ from PyQt5.QtWidgets import (
     QAbstractItemView
 )
 
-from vtkmodules.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
+from vtk.qt.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from PyQt5 import QtCore
 from PyQt5.Qt import QStandardItemModel, QStandardItem
 
@@ -35,12 +35,11 @@ from vedo import (
     Plotter,
     printc,
     Mesh,
-    base,
     Point
 )
 
 ## iPython
-# These for embeded pythion console
+# These for embedded python console
 os.environ['QT_API'] = 'pyqt5'
 # iPython won't work if this is not correctly installed. And the error message will be misleading
 # from IPython.qt.console.rich_ipython_widget import RichIPythonWidget # deprecated
@@ -282,18 +281,17 @@ class MainWindow(QMainWindow):
         m = Mesh(inputPath)
         m.name = inputBaseName
         self.objs.append(m)
-        # self.plt.add(m)
         # self.plt.show(zoom=True)                 # <--- show the vedo rendering
         objectTreeItem = QStandardItem(inputBaseName)
-        fileDirTreeItem = QStandardItem("File: "+inputPath)
-        numVerticesTreeItem = QStandardItem("Vertices: "+str(base.BaseActor.N(m)))
-        numFacesTreeItem = QStandardItem("Faces: "+str(base.BaseActor.NCells(m)))
-        objectTreeItem.appendRows([fileDirTreeItem,numVerticesTreeItem,numFacesTreeItem])
+        fileDirTreeItem = QStandardItem("File: " + inputPath)
+        numVerticesTreeItem = QStandardItem("Vertices: " + str(m.npoints))
+        numFacesTreeItem = QStandardItem("Faces: " + str(m.ncells))
+        objectTreeItem.appendRows([fileDirTreeItem, numVerticesTreeItem, numFacesTreeItem])
         self.rootNode.appendRow(objectTreeItem)
         self.displayPlotter()
 
     def displayPlotter(self):
-        self.plt.show(self.objs, self.actorSelection, self.vertexSelections, zoom=True)        # <--- show the vedo rendering
+        self.plt.show(self.objs, self.actorSelection, self.vertexSelections, zoom=True)
 
     def actionSelectActor_state_changed(self):
         if(self.action_selectActor.isChecked()):
