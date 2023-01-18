@@ -2,10 +2,6 @@
 
 # UMTRI 3D GUI
 
-[![Downloads](https://img.shields.io/github/downloads/p0deje/Maccy/total.svg)](https://github.com/danieljiang520/UMTRI_3DGUI)
-[![Build Status](https://img.shields.io/bitrise/716921b669780314/master?token=3pMiCb5dpFzlO-7jTYtO3Q)](https://github.com/danieljiang520/Simba)
-[![Donate](https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg)](https://account.venmo.com/u/daniel17520)
-
 This is a graphical user interface tool for processing 3D kinect scan files. It can automatically remove background points from 3D Kinect scans, create watertight body shape surfaces, and visualize final noise-free meshes, providing data to generate realistic body shape and dimension predictions.
 
 It works on macOS Mojave 10.14 or higher.
